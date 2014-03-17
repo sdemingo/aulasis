@@ -1,0 +1,24 @@
+<serverconfig>
+
+  <config>
+
+  </config>
+
+
+  <course>
+    <name>Modulo 1</name>
+    <path>modulo1</path>
+    <description>
+      Breve descripción del módulo 1
+    </description>
+  </course>
+
+  <course>
+    <name>Modulo 2</name>
+    <path>modulo2</path>
+    <description>
+      Breve descripción del módulo 2
+    </description>
+  </course>
+
+</serverconfig>

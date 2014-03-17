@@ -1,0 +1,71 @@
+*{
+    font-family:Helvetica;
+}
+
+body{
+    margin:0;
+}
+
+
+/*
+  Cabecera
+*/
+
+header{
+    background-color:white;
+    width:100%;
+    min-height:80px;
+    line-height:45px;
+    margin:0 auto;
+    font-size:120%;
+}
+
+
+
+#clock{
+    float:right;
+    vertical-align: middle;
+    height:100%;
+    margin:10px;
+}
+
+
+
+/*
+  Contenido
+*/
+
+main{
+    color:#00008B;
+    width:70%;
+    margin:0 auto;
+    min-height:100%;
+}
+
+main table{
+    width:100%;
+    border:1px solid #00008B;
+}
+
+main h1{
+    width:100%;
+    border-bottom:4px double #00008B;
+}
+
+
+
+/*
+  Pie de página
+*/
+
+footer{
+    position:absolute;
+    bottom:0;
+    width:100%;
+    height:50px;
+    line-height:40px;
+    margin:0 auto;
+    background-color: 	#20B2AA;
+    border-top:1px solid silver;
+    text-align:center;
+}
