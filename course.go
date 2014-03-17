@@ -12,7 +12,7 @@ import (
 
 type ServerConfig struct{
 	XMLName xml.Name `xml:"serverconfig"`
-	Courses []Course `xml:"course"`
+	Courses []*Course `xml:"course"`
 }
 
 
@@ -20,7 +20,7 @@ type Course struct{
 	Name string `xml:"name"`
 	Path string `xml:"path"`
 	Desc string `xml:"description"`
-	Tasks []Task
+	Tasks []*Task
 }
 
 
@@ -53,10 +53,8 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 	for c:=range config.Courses{
 		config.Courses[c].Desc=strings.Trim(config.Courses[c].Desc, " \n")
-
-		fmt.Printf("Loading course %s from %s/\n",config.Courses[c].Name,config.Courses[c].Path)
-
-		LoadCourse(config.Courses[c].Path)
+		fmt.Printf("Loading course %s\n",config.Courses[c].Name)
+		LoadCourse(config.Courses[c])
 	}
 
 	return config
@@ -64,23 +62,25 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 
 
-func LoadCourse(dir string)(*Course){
+func LoadCourse(course *Course){
 	
-	dirpath:="./srv/"+dir
+	dirpath:="./srv/"+course.Path
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
 		fmt.Printf("error: %v", err)
-		return nil
+		return 
 	}
 
-	
+	course.Tasks=make([]*Task,len(infos))
+
 	for i:=range infos{
 		path:=dirpath+"/"+infos[i].Name()+"/info.org"
-		LoadTask(path)
+		t:=LoadTask(path)
+		course.Tasks[i]=t  //maybe nill
+		if (t!=nil){
+			fmt.Printf("\tLoading task \"%s\"\n",t.Name)
+		}
 	}
-
-
-	return nil
 }
 
 
@@ -98,8 +98,6 @@ func LoadTask(orgfile string)(*Task){
 	task:=new(Task)
 	task.Content=b
 	task.Name=ParseHeader(b,"TITLE")
-
-	fmt.Printf("\tLoading task titled %s from %s\n",task.Name,orgfile)
 
 	return task
 }
