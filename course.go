@@ -56,3 +56,4 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 	return config
 }
+
