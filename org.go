@@ -54,6 +54,15 @@ var olistReg = regexp.MustCompile("(?P<items>(\\<fake-oli\\>.+\\n)+)")
 
 
 
+func ParseHeader(content []byte, header string)(string){
+
+	headerReg:= regexp.MustCompile("(?m)^\\s*\\#\\+"+header+":\\s*.*\\n")
+	out:=string(headerReg.Find(content))
+	out=strings.Replace(out,"#+"+header+":","",-1)
+	return strings.Trim(out," \t\n")
+}
+
+
 
 func ParseProperty(content []byte, key string)(string){
 

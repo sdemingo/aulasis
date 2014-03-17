@@ -4,7 +4,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"fmt"
 )
 
 
@@ -36,10 +35,11 @@ func main() {
 	//http.HandleFunc("/view/", viewHandler)
 	//http.ListenAndServe(":9090", nil)
 
-	sc:=LoadServerConfig("srv/meta.xml")
+	LoadServerConfig("srv/meta.xml")
 
+/*
 	for c:=range sc.Courses{
 		fmt.Printf("%s   %s\n",sc.Courses[c].Name, sc.Courses[c].Desc)
-	}
+	}*/
 }
 
