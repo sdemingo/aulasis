@@ -2,7 +2,7 @@ package main
 
 
 import (
-	"html/template"
+	"text/template"
 	"net/http"
 	"fmt"
 )
@@ -10,12 +10,14 @@ import (
 
 type Server struct{
 	Config ServerConfig
+	tmpl *template.Template
 }
 
 func CreateServer(config *ServerConfig)(*Server){
 	srv:=new(Server)
 
 	srv.Config=*config
+
 	return srv
 }
 
@@ -29,8 +31,6 @@ func (srv *Server) Start(){
 
 
 
-
-
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 
@@ -38,17 +38,28 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 	course:=r.URL.Path[len(coursesPath):]
 
 	if course!=""{
-		fmt.Printf("cargamos curso %s\n",course)
+		c:=srv.Config.GetCourseByPath(course)
+		if c==nil{
+			t := template.Must(template.ParseFiles("views/error.html"))
+			err:=t.Execute(w, nil)
+			if err!=nil{
+				fmt.Printf("%v\n",err)
+			}
+		}else{
+
+			t := template.Must(template.ParseFiles("views/course.html"))
+			err:=t.Execute(w, c)
+			if err!=nil{
+				fmt.Printf("%v\n",err)
+			}
+		}
 		
 	}else{
-		t, err:= template.ParseFiles("views/index.html")
-		
-		if err!=nil {
-			fmt.Printf("%v",err)
-			return
+		t := template.Must(template.ParseFiles("views/index.html"))
+		err:=t.Execute(w, srv.Config)
+		if err!=nil{
+			fmt.Printf("%v\n",err)
 		}
-
-		t.Execute(w, srv.Config)
 	}
 }
 

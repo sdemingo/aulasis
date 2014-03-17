@@ -16,6 +16,16 @@ type ServerConfig struct{
 }
 
 
+func (sc *ServerConfig) GetCourseByPath(path string)(*Course){
+	for i:=range sc.Courses{
+		if sc.Courses[i].Path==path{
+			return sc.Courses[i]
+		}
+	}
+	return nil
+}
+
+
 type Course struct{
 	Name string `xml:"name"`
 	Path string `xml:"path"`
