@@ -53,7 +53,7 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 	for c:=range config.Courses{
 		config.Courses[c].Desc=strings.Trim(config.Courses[c].Desc, " \n")
-		fmt.Printf("Loading course %s\n",config.Courses[c].Name)
+		//fmt.Printf("Loading course %s\n",config.Courses[c].Name)
 		LoadCourse(config.Courses[c])
 	}
 
@@ -77,9 +77,9 @@ func LoadCourse(course *Course){
 		path:=dirpath+"/"+infos[i].Name()+"/info.org"
 		t:=LoadTask(path)
 		course.Tasks[i]=t  //maybe nill
-		if (t!=nil){
-			fmt.Printf("\tLoading task \"%s\"\n",t.Name)
-		}
+		// if (t!=nil){
+		// 	fmt.Printf("\tLoading task \"%s\"\n",t.Name)
+		// }
 	}
 }
 

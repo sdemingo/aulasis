@@ -4,8 +4,8 @@
   <head>
     <title>No Title</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-    <link rel="stylesheet" type="text/css" href="default.css"/>
-    <script type="text/javascript" src="utils.js"></script>
+    <link rel="stylesheet" type="text/css" href="/views/default.css"/>
+    <script type="text/javascript" src="/views/utils.js"></script>
     <script type="text/javascript">
      window.onload=function(){
        showClock(document.getElementById("clock"))
@@ -18,32 +18,19 @@
       <div id="clock"></div>
     </header>
     <main>
-      <h1>Actividades recientes</h1>
-      <table>
-	<tr>
-	  <td>Nombre de prueba</td>
-	  <td>Abierta</td>
-	  <td>23 participantes</td>
-	</tr>
-	<tr>
-	  <td>Nombre de prueba</td>
-	  <td>Abierta</td>
-	  <td>23 participantes</td>
-	</tr>
-	<tr>
-	  <td>Nombre de prueba</td>
-	  <td>Abierta</td>
-	  <td>23 participantes</td>
-	</tr>
-	<tr>
-	  <td>Nombre de prueba</td>
-	  <td>Abierta</td>
-	  <td>23 participantes</td>
-	</tr>
-      </table>
+      <h1>Cursos</h1>
+      {{range $i,$c := .Courses}}
+      {{if $c}}
+      <div class="course">
+	<h2>{{$c.Name}}</h2>
+	<p>{{$c.Desc}}</p>
+      </div>
+     {{end}}
+     {{end}}
     </main>
     <footer>
       <small>Pie de página</small>
     </footer>
   </body>
 </html>
+
