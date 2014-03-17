@@ -40,29 +40,26 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 	if course!=""{
 		c:=srv.Config.GetCourseByPath(course)
 		if c==nil{
-			t := template.Must(template.ParseFiles("views/error.html"))
-			err:=t.Execute(w, nil)
-			if err!=nil{
-				fmt.Printf("%v\n",err)
-			}
-		}else{
+			renderTemplate(w,r,"error",nil)
+			return
+		}
 
-			t := template.Must(template.ParseFiles("views/course.html"))
-			err:=t.Execute(w, c)
-			if err!=nil{
-				fmt.Printf("%v\n",err)
-			}
-		}
-		
+		renderTemplate(w,r,"course",c)
 	}else{
-		t := template.Must(template.ParseFiles("views/index.html"))
-		err:=t.Execute(w, srv.Config)
-		if err!=nil{
-			fmt.Printf("%v\n",err)
-		}
+		renderTemplate(w,r,"index",srv.Config)
 	}
 }
 
 
+func renderTemplate(w http.ResponseWriter, r *http.Request, 
+	name string, 
+	cont interface{}) {
+
+	t := template.Must(template.ParseFiles("views/"+name+".html"))
+	err:=t.Execute(w, cont)
+	if err!=nil{
+		fmt.Printf("%v\n",err)
+	}
+}
 
 
