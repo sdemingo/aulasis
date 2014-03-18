@@ -5,6 +5,7 @@ import (
 	"text/template"
 	"net/http"
 	"fmt"
+	"strings"
 )
 
 
@@ -36,20 +37,28 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 
 	coursesPath:="/courses/"
-	course:=r.URL.Path[len(coursesPath):]
+	rpath:=r.URL.Path[len(coursesPath):]
 
-	if course!=""{
-		c:=srv.Config.GetCourseByPath(course)
-		if c==nil{
-			renderTemplate(w,r,"error",nil)
-			return
+	fields:=strings.Split(rpath,"/")
+	if (len(fields)==1){
+		if fields[0]==""{
+			renderTemplate(w,r,"index",srv.Config)
+		}else{
+			c:=srv.Config.GetCourseByPath(fields[0])
+			if c==nil{
+				renderTemplate(w,r,"error",nil)
+				return
+			}
+			renderTemplate(w,r,"course",c)
 		}
+	}
 
-		renderTemplate(w,r,"course",c)
-	}else{
-		renderTemplate(w,r,"index",srv.Config)
+	if (len(fields)==2){
+		// load activity
+		fmt.Printf("must load task %s\n",fields[1])
 	}
 }
+
 
 
 func renderTemplate(w http.ResponseWriter, r *http.Request, 

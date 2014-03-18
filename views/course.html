@@ -17,7 +17,14 @@
       <main>
 	<h1>{{.Name}}</h1>
 	<p>{{.Desc}}
-	  <h2>Listado de actividades</h2>
+	  <h2>Listado de actividades propuestas</h2>
+	  <ul>
+	  {{ range $i,$t := .Tasks }}
+	  {{ if $t }}
+	    <li>{{ $t.Name }}</li>
+	  {{ end }}
+	  {{ end }}
+	  </ul>
       </main>
       <footer>
 	<small>Pie de página</small>
