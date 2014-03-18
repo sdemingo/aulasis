@@ -21,7 +21,7 @@
 	  <ul>
 	  {{ range $i,$t := .Tasks }}
 	  {{ if $t }}
-	    <li>{{ $t.Name }}</li>
+	    <li><a href="/course/{{ .Path }}/info.org">{{ $t.Name }}</a></li>
 	  {{ end }}
 	  {{ end }}
 	  </ul>

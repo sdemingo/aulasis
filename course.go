@@ -36,6 +36,7 @@ type Course struct{
 
 type Task struct{
 	Name string
+	Path string
 	Content []byte
 }
 
@@ -84,18 +85,15 @@ func LoadCourse(course *Course){
 	course.Tasks=make([]*Task,len(infos))
 
 	for i:=range infos{
-		path:=dirpath+"/"+infos[i].Name()+"/info.org"
-		t:=LoadTask(path)
+		t:=LoadTask(dirpath,infos[i].Name())
 		course.Tasks[i]=t  //maybe nill
-		// if (t!=nil){
-		// 	fmt.Printf("\tLoading task \"%s\"\n",t.Name)
-		// }
 	}
 }
 
 
 
-func LoadTask(orgfile string)(*Task){
+func LoadTask(coursedir,taskname string)(*Task){
+	orgfile:=coursedir+"/"+taskname+"/info.org"
 	orgFile, err := os.Open(orgfile)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -107,6 +105,7 @@ func LoadTask(orgfile string)(*Task){
 
 	task:=new(Task)
 	task.Content=b
+	task.Path=coursedir+"/"+taskname
 	task.Name=ParseHeader(b,"TITLE")
 
 	return task
