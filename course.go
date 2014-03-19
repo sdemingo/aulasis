@@ -16,9 +16,9 @@ type ServerConfig struct{
 }
 
 
-func (sc *ServerConfig) GetCourseByPath(path string)(*Course){
+func (sc *ServerConfig) GetCourseById(id string)(*Course){
 	for i:=range sc.Courses{
-		if sc.Courses[i].Path==path{
+		if sc.Courses[i].Id==id{
 			return sc.Courses[i]
 		}
 	}
@@ -28,7 +28,7 @@ func (sc *ServerConfig) GetCourseByPath(path string)(*Course){
 
 type Course struct{
 	Name string `xml:"name"`
-	Path string `xml:"path"`
+	Id string `xml:"path"`
 	Desc string `xml:"description"`
 	Tasks []*Task
 }
@@ -36,7 +36,7 @@ type Course struct{
 
 type Task struct{
 	Name string
-	Path string
+	Id string
 	Content []byte
 }
 
@@ -75,7 +75,7 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 func LoadCourse(course *Course){
 	
-	dirpath:="./srv/"+course.Path
+	dirpath:="./srv/"+course.Id
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
 		fmt.Printf("error: %v", err)
@@ -105,7 +105,7 @@ func LoadTask(coursedir,taskname string)(*Task){
 
 	task:=new(Task)
 	task.Content=b
-	task.Path=coursedir+"/"+taskname
+	task.Id=taskname
 	task.Name=ParseHeader(b,"TITLE")
 
 	return task

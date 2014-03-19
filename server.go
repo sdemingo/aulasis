@@ -24,7 +24,7 @@ func CreateServer(config *ServerConfig)(*Server){
 
 func (srv *Server) Start(){
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
-	http.HandleFunc("/courses/", srv.coursesHandler)
+	http.HandleFunc("/courses/",srv.coursesHandler)
 	http.ListenAndServe(":9090", nil)
 }
 
@@ -35,27 +35,32 @@ func (srv *Server) Start(){
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
+	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
 
-	coursesPath:="/courses/"
-	rpath:=r.URL.Path[len(coursesPath):]
 
-	fields:=strings.Split(rpath,"/")
-	if (len(fields)==1){
-		if fields[0]==""{
-			renderTemplate(w,r,"index",srv.Config)
-		}else{
-			c:=srv.Config.GetCourseByPath(fields[0])
-			if c==nil{
-				renderTemplate(w,r,"error",nil)
-				return
+	if rpath=="" || strings.HasSuffix(rpath,".html"){
+		// Aplicar template
+		fields:=strings.Split(rpath,"/")
+		if (len(fields)==1){
+			if fields[0]==""{
+				renderTemplate(w,r,"index",srv.Config)
+			}else{
+				cname:=strings.TrimSuffix(fields[0],".html")
+				c:=srv.Config.GetCourseById(cname)
+				if c==nil{
+					renderTemplate(w,r,"error",nil)
+					return
+				}
+				renderTemplate(w,r,"course",c)
 			}
-			renderTemplate(w,r,"course",c)
+		}else if (len(fields)==2){
+			fmt.Printf("must load task %s\n",fields[1])
 		}
-	}
 
-	if (len(fields)==2){
-		// load activity
-		fmt.Printf("must load task %s\n",fields[1])
+	}else{
+		// recurso estático
+		fmt.Printf("recurso estático: /srv/courses/%s\n",rpath)
+
 	}
 }
 
