@@ -23,7 +23,7 @@ func CreateServer(config *ServerConfig)(*Server){
 }
 
 func (srv *Server) Start(){
-	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web")))) 
+	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
 	http.HandleFunc("/courses/", srv.coursesHandler)
 	http.ListenAndServe(":9090", nil)
 }
