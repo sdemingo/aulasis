@@ -19,9 +19,10 @@
 	<p>{{.Desc}}
 	  <h2>Listado de actividades propuestas</h2>
 	  <ul>
+	  {{ $c:=. }}
 	  {{ range $i,$t := .Tasks }}
 	  {{ if $t }}
-	    <li><a href="/course/{{ .Id }}/info.org">{{ $t.Name }}</a></li>
+	    <li><a href="/courses/{{ $c.Id }}/{{ .Id }}/info.org">{{ $t.Name }}</a></li>
 	  {{ end }}
 	  {{ end }}
 	  </ul>

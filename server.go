@@ -59,8 +59,9 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 	}else{
 		// recurso estático
-		fmt.Printf("recurso estático: /srv/courses/%s\n",rpath)
-
+		rpath="srv/"+rpath
+		fmt.Printf("recurso estático: %s\n",rpath)
+		http.ServeFile(w, r, rpath)
 	}
 }
 
