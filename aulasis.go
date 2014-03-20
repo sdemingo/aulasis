@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 
-	config:=LoadServerConfig("srv/meta.xml")
+	config:=LoadServerConfig("srv/courses/meta.xml")
 	if config==nil{
 		fmt.Printf("ServerConfig not loaded\n")
 	}

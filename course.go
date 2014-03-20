@@ -75,7 +75,7 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 func LoadCourse(course *Course){
 	
-	dirpath:="./srv/"+course.Id
+	dirpath:="./srv/courses/"+course.Id
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
 		fmt.Printf("error: %v", err)
