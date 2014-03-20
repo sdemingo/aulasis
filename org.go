@@ -37,6 +37,7 @@ var centerFooterReg = regexp.MustCompile("(?m)^\\#\\+END_CENTER\\n")
 var parReg = regexp.MustCompile("\\n\\n+(?P<text>[^\\n]+)")
 var allPropsReg = regexp.MustCompile(":PROPERTIES:(?s).+:END:")
 var rawHTML = regexp.MustCompile("\\<A-Za-z[^\\>]+\\>")
+var orgHeader = regexp.MustCompile("(?m)^\\s*\\#\\+.+:\\s*.*\\n")
 
 //estilos de texto
 var boldReg = regexp.MustCompile("(?P<prefix>[\\s|\\W]+)\\*(?P<text>[^\\s][^\\*]+)\\*(?P<suffix>[\\s|\\W]*)")
@@ -83,6 +84,7 @@ func Org2HTML(content []byte,url string)(string){
 
 	// First remove all HTML raw tags for security
 	out:=rawHTML.ReplaceAll(content,[]byte(""))
+	out=orgHeader.ReplaceAll(content,[]byte("\n"))
 
 	// headings (h1 is not admit in the post body)
 	out=head1Reg.ReplaceAll(out,[]byte("<h1>$head</h1>\n"))
