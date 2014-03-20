@@ -75,7 +75,8 @@ func ParseProperty(content []byte, key string)(string){
 	return strings.Trim(f[1]," \t")
 }
 
-
+// url param is the base dir of the static resources for this
+// document: images, etc..
 
 func Org2HTML(content []byte,url string)(string){
 

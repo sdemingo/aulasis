@@ -106,7 +106,7 @@ func (c *Course) GetTaskById(id string)(*Task){
 type Task struct{
 	Title string
 	Id string
-	Content []byte
+	Content string
 }
 
 
@@ -122,7 +122,7 @@ func LoadTask(coursedir,taskname string)(*Task){
 	b, _ := ioutil.ReadAll(orgFile)
 
 	task:=new(Task)
-	task.Content=b
+	task.Content=Org2HTML(b,coursedir+"/"+taskname)
 	task.Id=taskname
 	task.Title=ParseHeader(b,"TITLE")
 
