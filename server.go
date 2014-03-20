@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"fmt"
 	"strings"
+	"os"
 )
 
 
@@ -54,7 +55,6 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 				renderTemplate(w,r,"course",c)
 			}
 		}else if (len(fields)==2){
-			fmt.Printf("must load  %s\n",fields[1])
 			fields[1]=strings.TrimSuffix(fields[1],".html")
 
 			course,task:=fields[0],fields[1]
@@ -72,9 +72,11 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}else{
-		// recurso estático
-		// check if exists
-//		fmt.Printf("course: %s  task:%s\n",course,task)
+		info,err:=os.Stat("srv/courses/"+rpath)
+		if err!=nil || info.IsDir(){
+			renderTemplate(w,r,"error",nil)
+			return
+		}
 		http.ServeFile(w, r, "srv/courses/"+rpath)
 	}
 }
