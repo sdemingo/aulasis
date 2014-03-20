@@ -15,17 +15,10 @@
       <header>
       </header>
       <main>
-	<h1>{{.Name}}</h1>
-	<p>{{.Desc}}
-	  <h2>Listado de actividades propuestas</h2>
-	  <ul>
-	  {{ $c:=. }}
-	  {{ range $i,$t := .Tasks }}
-	  {{ if $t }}
-	    <li><a href="/courses/{{ $c.Id }}/{{ .Id }}.html">{{ $t.Title }}</a></li>
-	  {{ end }}
-	  {{ end }}
-	  </ul>
+	<h1>{{.Title}}</h1>
+	<div id="content">
+	  {{ .Content }}
+	</div>
       </main>
       <footer>
 	<small>Pie de página</small>

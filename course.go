@@ -16,30 +16,6 @@ type ServerConfig struct{
 }
 
 
-func (sc *ServerConfig) GetCourseById(id string)(*Course){
-	for i:=range sc.Courses{
-		if sc.Courses[i].Id==id{
-			return sc.Courses[i]
-		}
-	}
-	return nil
-}
-
-
-type Course struct{
-	Name string `xml:"name"`
-	Id string `xml:"path"`
-	Desc string `xml:"description"`
-	Tasks []*Task
-}
-
-
-type Task struct{
-	Name string
-	Id string
-	Content []byte
-}
-
 
 
 
@@ -73,6 +49,30 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 
 
+
+func (sc *ServerConfig) GetCourseById(id string)(*Course){
+	for i:=range sc.Courses{
+		if sc.Courses[i].Id==id{
+			return sc.Courses[i]
+		}
+	}
+	return nil
+}
+
+
+
+
+
+type Course struct{
+	Name string `xml:"name"`
+	Id string `xml:"path"`
+	Desc string `xml:"description"`
+	Tasks []*Task
+}
+
+
+
+
 func LoadCourse(course *Course){
 	
 	dirpath:="./srv/courses/"+course.Id
@@ -91,6 +91,24 @@ func LoadCourse(course *Course){
 }
 
 
+func (c *Course) GetTaskById(id string)(*Task){
+	for i:=range c.Tasks{
+		if c.Tasks[i].Id==id{
+			return c.Tasks[i]
+		}
+	}
+	return nil
+}
+
+
+
+
+type Task struct{
+	Title string
+	Id string
+	Content []byte
+}
+
 
 func LoadTask(coursedir,taskname string)(*Task){
 	orgfile:=coursedir+"/"+taskname+"/info.org"
@@ -106,7 +124,7 @@ func LoadTask(coursedir,taskname string)(*Task){
 	task:=new(Task)
 	task.Content=b
 	task.Id=taskname
-	task.Name=ParseHeader(b,"TITLE")
+	task.Title=ParseHeader(b,"TITLE")
 
 	return task
 }

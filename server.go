@@ -54,14 +54,28 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 				renderTemplate(w,r,"course",c)
 			}
 		}else if (len(fields)==2){
-			fmt.Printf("must load task %s\n",fields[1])
+			fmt.Printf("must load  %s\n",fields[1])
+			fields[1]=strings.TrimSuffix(fields[1],".html")
+
+			course,task:=fields[0],fields[1]
+			c:=srv.Config.GetCourseById(course)
+			if c==nil{
+				renderTemplate(w,r,"error",nil)
+				return
+			}
+			t:=c.GetTaskById(task)
+			if t==nil{
+				renderTemplate(w,r,"error",nil)
+				return
+			}
+			renderTemplate(w,r,"task",t)
 		}
 
 	}else{
 		// recurso estático
-		rpath="srv/courses/"+rpath
-		fmt.Printf("recurso estático: %s\n",rpath)
-		http.ServeFile(w, r, rpath)
+		// check if exists
+//		fmt.Printf("course: %s  task:%s\n",course,task)
+		http.ServeFile(w, r, "srv/courses/"+rpath)
 	}
 }
 
