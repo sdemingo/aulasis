@@ -14,4 +14,9 @@ Probamos a incrustar una imagen:
 [[imagen.jpg]]
 
 
+Pruebo también a meter una lista de enlaces:
+  - Este es un [[file:imagen.jpg][enlace a un fichero]]
+  - Este es un [[http://www.google.com][enlace externo]]
+  - Este es otro [[file:imagen.jpg][enlace a otro fichero]]
+
 

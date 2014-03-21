@@ -19,7 +19,7 @@ import (
 var head1Reg = regexp.MustCompile("(?m)^\\* (?P<head>.+)\\n")
 var head2Reg = regexp.MustCompile("(?m)^\\*\\* (?P<head>.+)\\n")
 var linkReg = regexp.MustCompile("\\[\\[(?P<url>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\\]\\]")
-var imgLinkReg = regexp.MustCompile("\\[\\[file:\\.\\./img/(?P<img>[^\\]]+)\\]\\[file:\\.\\./img/(?P<thumb>[^\\]]+)\\]\\]")
+var localLinkReg = regexp.MustCompile("\\[\\[file:(?P<src>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\\]\\]")
 var imgReg = regexp.MustCompile("\\[\\[(?P<src>[^\\]]+)\\]\\]")
 
 var codeReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\n(?P<code>(?s)[^\\#]+)^\\#\\+END_SRC\\n")
@@ -92,7 +92,7 @@ func Org2HTML(content []byte,basedir string)(string){
 
 	// images
 	out=imgReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+basedir+"/$src'><img src='"+basedir+"/$src'/></a></div>"))
-	//out=imgLinkReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+url+"/img/$img'><img src='"+url+"/img/thumbs/$thumb'/></a></div>"))
+	out=localLinkReg.ReplaceAll(out,[]byte("<a href='"+basedir+"/$src'>$text</a>"))
 	out=linkReg.ReplaceAll(out,[]byte("<a href='$url'>$text</a>"))
 
 
