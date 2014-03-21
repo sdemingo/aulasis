@@ -9,7 +9,7 @@ body{
 
 /*
   Cabecera
-*/
+  */
 
 header{
     background-color:white;
@@ -30,16 +30,29 @@ header{
 }
 
 
+html,
+body {
+    margin:0;
+    padding:0;
+    height:100%;
+}
+
+
+#wrapper{
+    position:relative;
+    min-height:100%;
+}
 
 /*
   Contenido
-*/
+  */
 
 main{
     color:#00008B;
     width:70%;
     margin:0 auto;
-    min-height:100%;
+
+    padding-bottom:100px;
 }
 
 main table{
@@ -52,19 +65,29 @@ main h1{
     border-bottom:4px double #00008B;
 }
 
+main img{
+    width:75%;
+    margin:auto;
+
+    padding:3px;
+    border:2px solid #00008B;
+}
+
 
 
 /*
   Pie de página
-*/
+  */
 
 footer{
     position:absolute;
     bottom:0;
+    left:0;
     width:100%;
     height:50px;
+
+
     line-height:40px;
-    margin:0 auto;
     background-color: 	#20B2AA;
     border-top:1px solid silver;
     text-align:center;

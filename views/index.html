@@ -10,22 +10,24 @@
     </script>
   </head>
   <body>
-    <header>
-    </header>
-    <main>
-      <h1>Cursos</h1>
+    <div id="wrapper">
+      <header>
+      </header>
+      <main>
+	<h1>Cursos</h1>
       {{range $i,$c := .Courses}}
       {{if $c}}
-      <div class="course">
-	<h2><a href="/courses/{{$c.Id}}.html">{{$c.Name}}</h2></a>
-	<p>{{$c.Desc}}</p>
-      </div>
+	<div class="course">
+	  <h2><a href="/courses/{{$c.Id}}.html">{{$c.Name}}</h2></a>
+	  <p>{{$c.Desc}}</p>
+	</div>
      {{end}}
      {{end}}
-    </main>
-    <footer>
-      <small>Pie de página</small>
-    </footer>
+      </main>
+      <footer>
+	<small>Pie de página</small>
+      </footer>
+    </div>
   </body>
 </html>
 

@@ -91,7 +91,7 @@ func Org2HTML(content []byte,basedir string)(string){
 	out=head2Reg.ReplaceAll(out,[]byte("<h2>$head</h2>\n"))
 
 	// images
-	out=imgReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+basedir+"/$src'><img src='"+basedir+"/$src'/></a></div>"))
+	out=imgReg.ReplaceAll(out,[]byte("<a href='"+basedir+"/$src'><img src='"+basedir+"/$src'/></a>"))
 	out=localLinkReg.ReplaceAll(out,[]byte("<a href='"+basedir+"/$src'>$text</a>"))
 	out=linkReg.ReplaceAll(out,[]byte("<a href='$url'>$text</a>"))
 
