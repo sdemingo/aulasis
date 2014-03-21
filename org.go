@@ -20,7 +20,7 @@ var head1Reg = regexp.MustCompile("(?m)^\\* (?P<head>.+)\\n")
 var head2Reg = regexp.MustCompile("(?m)^\\*\\* (?P<head>.+)\\n")
 var linkReg = regexp.MustCompile("\\[\\[(?P<url>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\\]\\]")
 var imgLinkReg = regexp.MustCompile("\\[\\[file:\\.\\./img/(?P<img>[^\\]]+)\\]\\[file:\\.\\./img/(?P<thumb>[^\\]]+)\\]\\]")
-var imgReg = regexp.MustCompile("\\[\\[\\.\\./img/(?P<src>[^\\]]+)\\]\\]")
+var imgReg = regexp.MustCompile("\\[\\[(?P<src>[^\\]]+)\\]\\]")
 
 var codeReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\n(?P<code>(?s)[^\\#]+)^\\#\\+END_SRC\\n")
 var codeHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\n")
@@ -76,10 +76,10 @@ func ParseProperty(content []byte, key string)(string){
 	return strings.Trim(f[1]," \t")
 }
 
-// url param is the base dir of the static resources for this
+// basedir param is the base dir of the static resources for this
 // document: images, etc..
 
-func Org2HTML(content []byte,url string)(string){
+func Org2HTML(content []byte,basedir string)(string){
 
 
 	// First remove all HTML raw tags for security
@@ -91,8 +91,8 @@ func Org2HTML(content []byte,url string)(string){
 	out=head2Reg.ReplaceAll(out,[]byte("<h2>$head</h2>\n"))
 
 	// images
-	out=imgReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+url+"/img/$src'><img src='"+url+"/img/thumbs/$src'/></a></div>"))
-	out=imgLinkReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+url+"/img/$img'><img src='"+url+"/img/thumbs/$thumb'/></a></div>"))
+	out=imgReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+basedir+"/$src'><img src='"+basedir+"/$src'/></a></div>"))
+	//out=imgLinkReg.ReplaceAll(out,[]byte("<div class='image'><a href='"+url+"/img/$img'><img src='"+url+"/img/thumbs/$thumb'/></a></div>"))
 	out=linkReg.ReplaceAll(out,[]byte("<a href='$url'>$text</a>"))
 
 

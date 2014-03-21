@@ -72,12 +72,14 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}else{
-		info,err:=os.Stat("srv/courses/"+rpath)
+		rpath="srv/courses/"+rpath
+		info,err:=os.Stat(rpath)
+		fmt.Printf("%s\n",rpath)
 		if err!=nil || info.IsDir(){
 			renderTemplate(w,r,"error",nil)
 			return
 		}
-		http.ServeFile(w, r, "srv/courses/"+rpath)
+		http.ServeFile(w, r, rpath)
 	}
 }
 

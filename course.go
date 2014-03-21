@@ -122,7 +122,7 @@ func LoadTask(coursedir,taskname string)(*Task){
 	b, _ := ioutil.ReadAll(orgFile)
 
 	task:=new(Task)
-	task.Content=Org2HTML(b,coursedir+"/"+taskname)
+	task.Content=Org2HTML(b,taskname)
 	task.Id=taskname
 	task.Title=ParseHeader(b,"TITLE")
 
