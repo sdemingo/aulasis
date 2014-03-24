@@ -20,6 +20,22 @@ header{
     font-size:120%;
 }
 
+header li{
+    float:left;
+    margin-left:20px;
+    font-size:small;
+}
+
+header ul{
+    list-style-type:none;
+}
+
+header ul a:active, a:link{
+    text-decoration:none;
+}
+
+
+
 
 
 #clock{
