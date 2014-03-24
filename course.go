@@ -103,10 +103,14 @@ func (c *Course) GetTaskById(id string)(*Task){
 
 
 
+
+
+
 type Task struct{
 	Title string
 	Id string
 	Content string
+	Upload bool
 }
 
 
@@ -125,6 +129,13 @@ func LoadTask(coursedir,taskname string)(*Task){
 	task.Content=Org2HTML(b,taskname)
 	task.Id=taskname
 	task.Title=ParseHeader(b,"TITLE")
+
+	sub,err := os.Stat(coursedir+"/"+taskname+"/submitted")
+	if err==nil && sub.IsDir(){
+		task.Upload=true
+	}else{
+		task.Upload=false
+	}
 
 	return task
 }

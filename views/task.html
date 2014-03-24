@@ -16,6 +16,14 @@
       </header>
       <main>
       {{ .Content }}
+      <hr>
+      {{ if .Upload }}
+        <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
+	  ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
+        <form>
+        <input type="file" id="uploads" multiple/>
+	</form>
+      {{end}}
       </main>
       <footer>
 	<small>Pie de página</small>
