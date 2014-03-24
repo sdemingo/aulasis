@@ -13,15 +13,19 @@
   <body>
     <div id="wrapper">
       <header>
+	<ul>
+	  <li><a href="/courses">Cursos</a></li>
+	  <li><a href="/courses/{{ .Course.Id }}.html">{{ .Course.Name }}</a></li>
+	</ul>
       </header>
       <main>
       {{ .Content }}
-      <hr>
+	<hr>
       {{ if .Upload }}
         <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
 	  ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
         <form>
-        <input type="file" id="uploads" multiple/>
+          <input type="file" id="uploads" multiple/>
 	</form>
       {{end}}
       </main>

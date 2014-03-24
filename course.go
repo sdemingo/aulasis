@@ -10,13 +10,13 @@ import (
 )
 
 
+
+
+
 type ServerConfig struct{
 	XMLName xml.Name `xml:"serverconfig"`
 	Courses []*Course `xml:"course"`
 }
-
-
-
 
 
 func LoadServerConfig (metafile string)(*ServerConfig){
@@ -28,7 +28,6 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
-
 
 	config:=new(ServerConfig)
 
@@ -48,8 +47,6 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 }
 
 
-
-
 func (sc *ServerConfig) GetCourseById(id string)(*Course){
 	for i:=range sc.Courses{
 		if sc.Courses[i].Id==id{
@@ -63,15 +60,17 @@ func (sc *ServerConfig) GetCourseById(id string)(*Course){
 
 
 
+
+
+
+
+
 type Course struct{
 	Name string `xml:"name"`
 	Id string `xml:"path"`
 	Desc string `xml:"description"`
 	Tasks []*Task
 }
-
-
-
 
 func LoadCourse(course *Course){
 	
@@ -85,7 +84,7 @@ func LoadCourse(course *Course){
 	course.Tasks=make([]*Task,len(infos))
 
 	for i:=range infos{
-		t:=LoadTask(dirpath,infos[i].Name())
+		t:=LoadTask(course,infos[i].Name())
 		course.Tasks[i]=t  //maybe nill
 	}
 }
@@ -106,7 +105,9 @@ func (c *Course) GetTaskById(id string)(*Task){
 
 
 
+
 type Task struct{
+	Course *Course
 	Title string
 	Id string
 	Content string
@@ -114,8 +115,8 @@ type Task struct{
 }
 
 
-func LoadTask(coursedir,taskname string)(*Task){
-	orgfile:=coursedir+"/"+taskname+"/info.org"
+func LoadTask(course *Course,taskId string)(*Task){
+	orgfile:="./srv/courses/"+course.Id+"/"+taskId+"/info.org"
 	orgFile, err := os.Open(orgfile)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -126,11 +127,12 @@ func LoadTask(coursedir,taskname string)(*Task){
 	b, _ := ioutil.ReadAll(orgFile)
 
 	task:=new(Task)
-	task.Content=Org2HTML(b,taskname)
-	task.Id=taskname
+	task.Content=Org2HTML(b,taskId)
+	task.Id=taskId
 	task.Title=ParseHeader(b,"TITLE")
+	task.Course=course
 
-	sub,err := os.Stat(coursedir+"/"+taskname+"/submitted")
+	sub,err := os.Stat("./srv/courses/"+course.Id+"/"+taskId+"/submitted")
 	if err==nil && sub.IsDir(){
 		task.Upload=true
 	}else{
