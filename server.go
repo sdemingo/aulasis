@@ -8,6 +8,7 @@ import (
 	"strings"
 	"os"
 	"io"
+	"time"
 )
 
 const MaxBytesBodySize=20*1024*1024
@@ -25,6 +26,7 @@ func CreateServer(config *ServerConfig)(*Server){
 	return srv
 }
 
+
 func (srv *Server) Start(){
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
 	http.HandleFunc("/courses/",srv.coursesHandler)
@@ -33,14 +35,45 @@ func (srv *Server) Start(){
 }
 
 
+func (srv *Server) getCourseAndTask(url string)(*Course,*Task){
+	fields:=strings.Split(url,"/")
+	var c *Course
+	var t *Task
+
+	if (len(fields)==1){
+		if fields[0]!=""{
+			course:=strings.TrimSuffix(fields[0],".html")
+			c=srv.Config.GetCourseById(course)
+			return c,nil
+		}
+	}else if (len(fields)==2){
+		fields[1]=strings.TrimSuffix(fields[1],".html")
+		course,task:=fields[0],fields[1]
+		c=srv.Config.GetCourseById(course)
+		t=c.GetTaskById(task)
+		return c,t
+	}
+	
+	return nil,nil
+}
+
+
 
 
 func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
-	
+
+	rpath:=strings.TrimPrefix(r.URL.Path,"/submit/")
+
+	var task *Task
+
+	if isDinamycUrl(rpath){
+		_,task=srv.getCourseAndTask(rpath)
+	}
+
 	//parse the multipart form in the request
 	err := r.ParseMultipartForm(MaxBytesBodySize)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		errorHandler(w,r,err.Error())
 		return
 	}
 	
@@ -50,7 +83,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	//get the *fileheaders
 	files := m.File["files"]
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		errorHandler(w,r,err.Error())
 		return
 	}
 
@@ -59,9 +92,11 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		file, err := files[i].Open()
 		defer file.Close()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			errorHandler(w,r,err.Error())
 			return
 		}
+
+
 		//create destination file making sure the path is writeable.
 		dst, err := os.Create("/tmp/" + files[i].Filename)
 		defer dst.Close()
@@ -69,56 +104,51 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+
 		//copy the uploaded file to the destination file
 		if _, err := io.Copy(dst, file); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			errorHandler(w,r,err.Error())
 			return
-		}
-		
+		}		
 	}
 
-	
+	sr:=new (SubmitReport)
+	sr.Files=len(files)
+	sr.Stamp=time.Now()
+	sr.Addr=r.RemoteAddr
+	sr.Task=task
+
+	renderTemplate(w,r,"submitted",sr)
 }
+
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
-	/*
-	 Hay que evitar accesos a subdirectorios submitted
-	 */
+	if strings.Contains(r.URL.Path,"submit"){
+		errorHandler(w,r,"Acceso no autorizado")
+		return
+	}
 
 	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
 
-	if rpath=="" || strings.HasSuffix(rpath,".html"){
-		// Aplicar template
-		fields:=strings.Split(rpath,"/")
-		if (len(fields)==1){
-			if fields[0]==""{
-				renderTemplate(w,r,"index",srv.Config)
-			}else{
-				cname:=strings.TrimSuffix(fields[0],".html")
-				c:=srv.Config.GetCourseById(cname)
-				if c==nil{
-					renderTemplate(w,r,"error",nil)
-					return
-				}
-				renderTemplate(w,r,"course",c)
-			}
-		}else if (len(fields)==2){
-			fields[1]=strings.TrimSuffix(fields[1],".html")
-
-			course,task:=fields[0],fields[1]
-			c:=srv.Config.GetCourseById(course)
-			if c==nil{
-				renderTemplate(w,r,"error",nil)
-				return
-			}
-			t:=c.GetTaskById(task)
-			if t==nil{
-				renderTemplate(w,r,"error",nil)
-				return
-			}
-			renderTemplate(w,r,"task",t)
+	if isDinamycUrl(rpath){
+		course,task:=srv.getCourseAndTask(rpath)
+		
+		if task!=nil{
+			//me piden tarea
+			renderTemplate(w,r,"task",task)
+			return
 		}
+
+		if course!=nil{
+			//me piden curso
+			renderTemplate(w,r,"course",course)
+			return
+		}
+
+		//me piden el principal
+		renderTemplate(w,r,"index",srv.Config)
 
 	}else{
 		rpath="srv/courses/"+rpath
@@ -134,8 +164,18 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 
 
+
+func errorHandler(w http.ResponseWriter, r *http.Request, message string){
+	t := template.Must(template.ParseFiles("views/error.html"))
+	err:=t.Execute(w, message)
+	if err!=nil{
+		fmt.Printf("%v\n",err)
+	}
+}
+
+
 func renderTemplate(w http.ResponseWriter, r *http.Request, 
-	name string, 
+	name string,
 	cont interface{}) {
 
 	t := template.Must(template.ParseFiles("views/"+name+".html"))
@@ -146,3 +186,8 @@ func renderTemplate(w http.ResponseWriter, r *http.Request,
 }
 
 
+
+func isDinamycUrl(url string)(bool){
+	//ends with an .html extensions or is the root 
+	return url=="" || strings.HasSuffix(url,".html")
+}

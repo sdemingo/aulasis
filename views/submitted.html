@@ -15,24 +15,13 @@
       <header>
 	<ul>
 	  <li><a href="/courses">Cursos</a></li>
-	  <li><a href="/courses/{{ .Course.Id }}.html">{{ .Course.Name }}</a></li>
+	  <li><a href="/courses/{{ .Task.Course.Id }}.html">{{ .Task.Course.Name }}</a></li>
 	</ul>
       </header>
       <main>
-      {{ .Content }}
-	<hr>
-      {{ if .Upload }}
-        <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
-	  ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
-        <form action="/submit/{{ .Course.Id }}/{{ .Id }}.html" method="POST" enctype="multipart/form-data"/>
-	  <label>Nombre:</label><input type="text" id="name">
-	  <label>Apellidos:</label><input type="text" id="surname" />
-	  <br>
-          <input type="file" id="files" name="files" multiple/>
-	  <br>
-	  <input type="submit" value="enviar" />
-	</form>
-      {{end}}
+	<p>Tarea "{{ .Task.Title }}" finalizada
+	<p>Entregados {{ .Files }} ficheros desde {{ .Addr }}</p>
+	<p>{{ .Stamp }}
       </main>
       <footer>
 	<small>Pie de página</small>

@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 
@@ -115,6 +116,18 @@ type Task struct{
 }
 
 
+
+type SubmitReport struct{
+	Task *Task
+	Path string
+	Name string
+	Surname string
+	Addr string
+	Stamp time.Time
+	Files int
+}
+
+
 func LoadTask(course *Course,taskId string)(*Task){
 	orgfile:="./srv/courses/"+course.Id+"/"+taskId+"/info.org"
 	orgFile, err := os.Open(orgfile)
@@ -141,3 +154,4 @@ func LoadTask(course *Course,taskId string)(*Task){
 
 	return task
 }
+
