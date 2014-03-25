@@ -7,8 +7,10 @@ import (
 	"fmt"
 	"strings"
 	"os"
+	"io"
 )
 
+const MaxBytesBodySize=20*1024*1024
 
 type Server struct{
 	Config ServerConfig
@@ -26,18 +28,65 @@ func CreateServer(config *ServerConfig)(*Server){
 func (srv *Server) Start(){
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
 	http.HandleFunc("/courses/",srv.coursesHandler)
+	http.HandleFunc("/submit/",srv.submitHandler)
 	http.ListenAndServe(":9090", nil)
 }
 
 
 
 
+func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
+	
+	//parse the multipart form in the request
+	err := r.ParseMultipartForm(MaxBytesBodySize)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	//get a ref to the parsed multipart form
+	m := r.MultipartForm
+	
+	//get the *fileheaders
+	files := m.File["files"]
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
+	for i, _ := range files {
+		//for each fileheader, get a handle to the actual file
+		file, err := files[i].Open()
+		defer file.Close()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		//create destination file making sure the path is writeable.
+		dst, err := os.Create("/tmp/" + files[i].Filename)
+		defer dst.Close()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		//copy the uploaded file to the destination file
+		if _, err := io.Copy(dst, file); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		
+	}
+
+	
+}
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
-	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
+	/*
+	 Hay que evitar accesos a subdirectorios submitted
+	 */
 
+	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
 
 	if rpath=="" || strings.HasSuffix(rpath,".html"){
 		// Aplicar template

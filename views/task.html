@@ -24,8 +24,13 @@
       {{ if .Upload }}
         <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
 	  ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
-        <form>
-          <input type="file" id="uploads" multiple/>
+        <form action="/submit/{{ .Course.Id }}/{{ .Id }}" method="POST" enctype="multipart/form-data"/>
+	  <label>Nombre:</label><input type="text" id="name">
+	  <label>Apellidos:</label><input type="text" id="surname" />
+	  <br>
+          <input type="file" id="files" name="files" multiple/>
+	  <br>
+	  <input type="submit" value="enviar" />
 	</form>
       {{end}}
       </main>
