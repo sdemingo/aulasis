@@ -104,7 +104,9 @@ func (c *Course) GetTaskById(id string)(*Task){
 
 
 
-
+const TASK_OPEN_STATUS = "open"
+const TASK_CLOSED_STATUS = "closed"
+const TASK_HIDE_STATUS = "hide"
 
 
 type Task struct{
@@ -112,7 +114,7 @@ type Task struct{
 	Title string
 	Id string
 	Content string
-	Upload bool
+	Status string
 }
 
 
@@ -144,14 +146,15 @@ func LoadTask(course *Course,taskId string)(*Task){
 	task.Id=taskId
 	task.Title=ParseHeader(b,"TITLE")
 	task.Course=course
-
-	sub,err := os.Stat("./srv/courses/"+course.Id+"/"+taskId+"/submitted")
-	if err==nil && sub.IsDir(){
-		task.Upload=true
-	}else{
-		task.Upload=false
+	task.Status=ParseProperty(b,"status")
+	if task.Status==""{
+		task.Status=TASK_CLOSED_STATUS
 	}
 
 	return task
 }
 
+
+func (task *Task) CheckStatus(st string)(bool){
+	return task.Status==st
+}
