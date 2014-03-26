@@ -74,7 +74,7 @@ type Course struct{
 }
 
 func LoadCourse(course *Course){
-	
+
 	dirpath:="./srv/courses/"+course.Id
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
@@ -92,12 +92,7 @@ func LoadCourse(course *Course){
 
 
 func (c *Course) GetTaskById(id string)(*Task){
-	for i:=range c.Tasks{
-		if c.Tasks[i].Id==id{
-			return c.Tasks[i]
-		}
-	}
-	return nil
+	return LoadTask(c,id)
 }
 
 

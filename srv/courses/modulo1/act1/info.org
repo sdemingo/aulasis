@@ -2,11 +2,11 @@
 
 * Texto descriptivo de la actividad 1
 :PROPERTIES:
-:Status: open
+:Status: closed
 :END:
 
 
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor
+Lorem ipsum dolor sit amet, aaaaaaaaa consectetuer adipiscing elit. Donec hendrerit tempor
 tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis
 eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis
 parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae
