@@ -28,8 +28,8 @@
 	    <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
 	      ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
 	    <form action="/submit/{{ .Course.Id }}/{{ .Id }}.html" method="POST" enctype="multipart/form-data"/>
-	    <label>Nombre:</label><input type="text" id="name">
-	    <label>Apellidos:</label><input type="text" id="surname" />
+	    <label>Nombre:</label><input type="text" name="name" id="name">
+	    <label>Apellidos:</label><input type="text" name="surname" id="surname" />
 	    <br>
 	    <input type="file" id="files" name="files" multiple/>
 	    <br>

@@ -2,7 +2,7 @@
 
 * Texto descriptivo de la actividad 1
 :PROPERTIES:
-:Status: closed
+:Status: open
 :END:
 
 

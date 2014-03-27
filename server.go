@@ -9,9 +9,11 @@ import (
 	"os"
 	"io"
 	"time"
+	"regexp"
 )
 
 const MaxBytesBodySize=20*1024*1024
+const CoursesDir="./srv/courses"
 
 type Server struct{
 	Config ServerConfig
@@ -58,6 +60,12 @@ func (srv *Server) getCourseAndTask(url string)(*Course,*Task){
 }
 
 
+func cleanName(name string)(string){
+	var noChars = regexp.MustCompile("[^A-Za-záéíóúÁÉÍÓÚñÑüÜ]+")
+	out:=noChars.ReplaceAllString(name,"")
+	out=strings.ToLower(out)
+	return out
+}
 
 
 func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,8 +78,23 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		_,task=srv.getCourseAndTask(rpath)
 	}
 
+	name:=cleanName(strings.ToLower(r.FormValue("name")))
+	surname:=cleanName(r.FormValue("surname"))
+
+	if name=="" || surname==""{
+		errorHandler(w,r,"Bad parametres in request")
+		return
+	}
+
+	dir:=CoursesDir+"/"+task.Course.Id+"/"+task.Id+"/submitted/"+name+"-"+surname
+	err:=os.MkdirAll(dir,0755)	
+	if name=="" || surname==""{
+		errorHandler(w,r,err.Error())
+		return
+	}
+
 	//parse the multipart form in the request
-	err := r.ParseMultipartForm(MaxBytesBodySize)
+	err = r.ParseMultipartForm(MaxBytesBodySize)
 	if err != nil {
 		errorHandler(w,r,err.Error())
 		return
@@ -98,7 +121,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 
 		//create destination file making sure the path is writeable.
-		dst, err := os.Create("/tmp/" + files[i].Filename)
+		dst, err := os.Create(dir+"/"+files[i].Filename)
 		defer dst.Close()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
