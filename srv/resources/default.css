@@ -212,3 +212,8 @@ footer{
     border-top:1px solid grey;
     text-align:center;
 }
+
+footer a{
+    text-decoration:underline;
+    color:grey;
+}
