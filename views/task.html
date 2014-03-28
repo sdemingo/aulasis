@@ -16,6 +16,7 @@
 	<ul>
 	  <li><a href="/courses">Cursos</a></li>
 	  <li><a href="/courses/{{ .Course.Id }}.html">{{ .Course.Name }}</a></li>
+	  <li><a href="/courses/{{ .Course.Id }}/{{ .Id }}.html">{{  .Title }}</a></li>
 	</ul>
       </header>
       <main>
