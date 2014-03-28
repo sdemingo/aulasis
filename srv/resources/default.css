@@ -39,18 +39,22 @@ header{
 header li{
     float:left;
     margin-left:20px;
-    font-size:small;
+}
 
-    color:grey;
+
+header li.right{
+    float:right;
+    margin-right:20px;
 }
 
 header ul{
     list-style-type:none;
 }
 
-header ul a{
+header a{
     text-decoration:none;
 
+    font-size:small;
     color:grey;
     background-color:white; 
     border:1px solid grey;
@@ -62,10 +66,9 @@ header ul a{
     padding:2px 5px 2px 5px;
 }
 
-header ul a:hover{
+header a:hover{
     background-color:	#E8E8E8 ;
 }
-
 
 
 
