@@ -16,13 +16,18 @@
 	<ul>
 	  <li><a href="/courses">Cursos</a></li>
 	  <li><a href="/courses/{{ .Task.Course.Id }}.html">{{ .Task.Course.Name }}</a></li>
-	  <li><a href="/courses/{{ .Course.Id }}/{{ .Id }}.html">{{  .Title }}</a></li>
+	  <li><a href="/courses/{{ .Task.Course.Id }}/{{ .Task.Id }}.html">{{  .Task.Title }}</a></li>
 	</ul>
       </header>
       <main>
-	<p>Tarea "{{ .Task.Title }}" finalizada
-	<p>Entregados {{ .Files }} ficheros desde {{ .Addr }}</p>
-	<p>{{ .Stamp }}
+	<h1>Tarea entregada</h1>
+	<p>Tarea <a href="/courses/{{ .Task.Course.Id }}/{{ .Task.Id }}.html">{{  .Task.Title }}</a> finalizada y entregada</p>
+	<ul>
+	<li>Recibidos {{ .Files }} ficheros desde {{ .Addr }}</li>
+	<li>En {{ .Stamp }}</li>
+	</ul>
+
+
       </main>
       <footer>
 	<small>Pie de página</small>

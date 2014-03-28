@@ -176,7 +176,6 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 	}else{
 		rpath="srv/courses/"+rpath
 		info,err:=os.Stat(rpath)
-		fmt.Printf("%s\n",rpath)
 		if err!=nil || info.IsDir(){
 			renderTemplate(w,r,"error",nil)
 			return
