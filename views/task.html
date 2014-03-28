@@ -20,21 +20,31 @@
       </header>
       <main>
 	{{ if .CheckStatus "hide" }}
-	    <p>This task is temporaly disabled</p>
+	<p>This task is temporaly disabled</p>
 	{{ else }}
 	  {{ .Content }}
-	    <hr>
+
 	  {{ if .CheckStatus "open" }}
-	    <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
+	<div id="upload-form">
+	  <h2>Entrega de actividad</h2>
+	  <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
 	      ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
-	    <form action="/submit/{{ .Course.Id }}/{{ .Id }}.html" method="POST" enctype="multipart/form-data"/>
-	    <label>Nombre:</label><input type="text" name="name" id="name">
-	    <label>Apellidos:</label><input type="text" name="surname" id="surname" />
-	    <br>
+	  <form action="/submit/{{ .Course.Id }}/{{ .Id }}.html" method="POST" enctype="multipart/form-data"/>
+	  <div class="item">
+	    <label>Nombre:</label>
+	    <input type="text" name="name" id="name">
+	  </div>
+	  <div class="item">
+	    <label>Apellidos:</label>
+	    <input type="text" name="surname" id="surname" />
+	  </div>
+	  <div class="item">
+	    <label>Ficheros:</label>
 	    <input type="file" id="files" name="files" multiple/>
-	    <br>
-	    <input type="submit" value="enviar" />
-	    </form>
+	  </div>
+	  <input type="submit" value="enviar" />
+	  </form>
+	</div>
 	  {{end}}
 	{{ end }}
       </main>

@@ -18,32 +18,37 @@ header{
     line-height:45px;
     margin:0 auto;
     font-size:120%;
+    border-bottom:1px solid silver;
 }
+
 
 header li{
     float:left;
     margin-left:20px;
     font-size:small;
+
+    color:grey;
 }
 
 header ul{
     list-style-type:none;
 }
 
-header ul a:active, a:link{
+header ul a{
     text-decoration:none;
+
+    color:grey;
+    background-color:#E8E8E8 ;
+    border:1px solid grey;
+
+    border-radius:3px; 
+    -moz-border-radius:3px; /* Firefox */ 
+    -webkit-border-radius:3px; /* Safari y Chrome */
+
+    padding:2px 5px 2px 5px;
 }
 
 
-
-
-
-#clock{
-    float:right;
-    vertical-align: middle;
-    height:100%;
-    margin:10px;
-}
 
 
 html,
@@ -59,12 +64,14 @@ body {
     min-height:100%;
 }
 
+
+
 /*
   Contenido
   */
 
 main{
-    color:#00008B;
+    color:black;
     width:70%;
     margin:0 auto;
 
@@ -73,21 +80,103 @@ main{
 
 main table{
     width:100%;
-    border:1px solid #00008B;
+    border:1px solid grey;
 }
 
 main h1{
     width:100%;
-    border-bottom:4px double #00008B;
+
+    color:grey;
+    background-color:#E8E8E8 ;
+    border:1px solid grey;
+
+    border-radius:3px; 
+    -moz-border-radius:3px; /* Firefox */ 
+    -webkit-border-radius:3px; /* Safari y Chrome */
+    
+    text-align:center;
+    padding:8px 8px 8px 8px;
 }
+
+main h2{
+    color:grey;
+    border-bottom:1px solid grey;
+}
+
 
 main img{
-    width:75%;
-    margin:auto;
+    width:60%;
+    margin-left:20%;
 
-    padding:3px;
-    border:2px solid #00008B;
+    padding:2px;
+    border:1px solid grey;
 }
+
+
+main a{
+    text-decoration:none;
+    color:grey;
+}
+
+main a:hover{
+    text-decoration:underline;
+}
+
+main ul{
+    list-style: none;
+}
+
+main li:before {
+    content: '\2022'; 
+    color: grey;
+    padding-right:3px;
+}
+
+
+#upload-form{
+    position:relative;
+    width:70%;
+    min-height:250px;
+    margin:0 auto;
+    margin-top:80px;
+    border:1px solid grey;
+    padding:15px;
+}
+
+#upload-form h2{
+    color:grey;
+    border:0;
+    padding:0;
+    margin:0;
+}
+
+#upload-form p{
+    text-align:justify;
+
+}
+
+#upload-form .item{
+    margin-bottom:10px;
+}
+
+#upload-form label{
+    float:left;
+    width:20%;
+    min-width:100px;
+}
+
+#upload-form input{
+    width:75%;
+}
+
+#upload-form input[type="submit"]{
+    position:absolute;
+    
+    width:60px;
+    bottom:15px;
+    right:15px;
+}
+
 
 
 

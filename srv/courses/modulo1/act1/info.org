@@ -13,6 +13,8 @@ parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae
 dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam
 rutrum. Nam vestibulum accumsan nisl.
 
+** Subtitulo de nivel 2
+
 Probamos a incrustar una imagen:
 
 [[imagen.jpg]]
