@@ -2,6 +2,7 @@ package main
 
 
 import (
+	"errors"
 	"text/template"
 	"net/http"
 	"fmt"
@@ -15,17 +16,37 @@ import (
 const MaxBytesBodySize=20*1024*1024
 const CoursesDir="./srv/courses"
 
+
 type Server struct{
-	Config ServerConfig
+	DirPath string
+	Config *ServerConfig
 	tmpl *template.Template
 }
 
-func CreateServer(config *ServerConfig)(*Server){
+func CreateServer(dirpath string)(*Server, error){
 	srv:=new(Server)
+	
+	srv.DirPath=dirpath
 
-	srv.Config=*config
+	_,err:=os.Stat(dirpath+"/courses")
+	if err!=nil{
+		return nil,errors.New("Server dirbase not courses directory")
+	}
 
-	return srv
+	_,err=os.Stat(dirpath+"/resources")
+	if err!=nil{
+		return nil,errors.New("Server dirbase not resources directory")
+	}
+
+
+	config:=LoadServerConfig(srv.DirPath)
+	if config==nil{
+	  return nil,errors.New("Server cannot loaded courses/meta.xml file")
+	}
+
+	srv.Config=config
+	  
+	return srv,nil
 }
 
 

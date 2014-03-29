@@ -12,17 +12,16 @@ import (
 
 
 
-
-
 type ServerConfig struct{
+	DirPath string
 	XMLName xml.Name `xml:"serverconfig"`
 	Courses []*Course `xml:"course"`
 }
 
 
-func LoadServerConfig (metafile string)(*ServerConfig){
+func LoadServerConfig (dir string)(*ServerConfig){
 
-	xmlFile, err := os.Open(metafile)
+	xmlFile, err := os.Open(dir+"/courses/meta.xml")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return nil
@@ -32,6 +31,7 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 	config:=new(ServerConfig)
 
+	config.DirPath=dir
 	err = xml.Unmarshal(b, &config)
 	if err != nil {
 		fmt.Printf("error: %v", err)
@@ -40,8 +40,7 @@ func LoadServerConfig (metafile string)(*ServerConfig){
 
 	for c:=range config.Courses{
 		config.Courses[c].Desc=strings.Trim(config.Courses[c].Desc, " \n")
-		//fmt.Printf("Loading course %s\n",config.Courses[c].Name)
-		LoadCourse(config.Courses[c])
+		LoadCourse(dir, config.Courses[c])
 	}
 
 	return config
@@ -67,15 +66,16 @@ func (sc *ServerConfig) GetCourseById(id string)(*Course){
 
 
 type Course struct{
+	BaseDir string
 	Name string `xml:"name"`
 	Id string `xml:"path"`
 	Desc string `xml:"description"`
 	Tasks []*Task
 }
 
-func LoadCourse(course *Course){
+func LoadCourse(basedir string, course *Course){
 
-	dirpath:="./srv/courses/"+course.Id
+	dirpath:=basedir+"/courses/"+course.Id
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
 		fmt.Printf("error: %v", err)
@@ -83,6 +83,7 @@ func LoadCourse(course *Course){
 	}
 
 	course.Tasks=make([]*Task,len(infos))
+	course.BaseDir=basedir
 
 	for i:=range infos{
 		t:=LoadTask(course,infos[i].Name())
@@ -126,7 +127,7 @@ type SubmitReport struct{
 
 
 func LoadTask(course *Course,taskId string)(*Task){
-	orgfile:="./srv/courses/"+course.Id+"/"+taskId+"/info.org"
+	orgfile:=course.BaseDir+"/courses/"+course.Id+"/"+taskId+"/info.org"
 	orgFile, err := os.Open(orgfile)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
