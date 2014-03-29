@@ -26,9 +26,9 @@ type Server struct{
 
 
 func CreateServer(dirpath string)(*Server, error){
+
 	srv:=new(Server)
-	
-	srv.DirPath=dirpath
+	srv.DirPath=strings.TrimRight(dirpath,"/")
 
 	_,err:=os.Stat(dirpath+"/courses")
 	if err!=nil{
@@ -40,14 +40,13 @@ func CreateServer(dirpath string)(*Server, error){
 		return nil,err
 	}
 
-
 	config:=LoadServerConfig(srv.DirPath)
 	if config==nil{
 	  return nil,err
-	}
+	  }
 
 	srv.Config=config
-	  
+	
 	return srv,nil
 }
 
@@ -56,6 +55,8 @@ func (srv *Server) Start(){
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
 	http.HandleFunc("/courses/",srv.coursesHandler)
 	http.HandleFunc("/submit/",srv.submitHandler)
+	http.HandleFunc("/",srv.rootHandler)
+
 	http.ListenAndServe(":9090", nil)
 }
 
@@ -89,6 +90,12 @@ func cleanName(name string)(string){
 	out=strings.ToLower(out)
 	return out
 }
+
+
+func (srv *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/courses", http.StatusMovedPermanently)
+}
+
 
 
 func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
