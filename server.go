@@ -76,6 +76,9 @@ func (srv *Server) getCourseAndTask(url string)(*Course,*Task){
 		fields[1]=strings.TrimSuffix(fields[1],".html")
 		course,task:=fields[0],fields[1]
 		c=srv.Config.GetCourseById(course)
+		if c==nil{
+			return nil,nil
+		}
 		t=c.GetTaskById(task)
 		return c,t
 	}
@@ -174,6 +177,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 	renderTemplate(w,r,"submitted",sr)
 }
+
 
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
