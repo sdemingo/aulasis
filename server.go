@@ -53,6 +53,8 @@ func CreateServer(dirpath string)(*Server, error){
 
 func (srv *Server) Start(){
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
+
+	http.HandleFunc("/package/",srv.packageHandler)
 	http.HandleFunc("/courses/",srv.coursesHandler)
 	http.HandleFunc("/submit/",srv.submitHandler)
 	http.HandleFunc("/",srv.rootHandler)
@@ -106,9 +108,10 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	rpath:=strings.TrimPrefix(r.URL.Path,"/submit/")
 
 	var task *Task
-
 	if isDinamycUrl(rpath){
 		_,task=srv.getCourseAndTask(rpath)
+	}else{
+		errorHandler(w,r,"Bad submit request")
 	}
 
 	name:=cleanName(strings.ToLower(r.FormValue("name")))
@@ -182,16 +185,19 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
+	//fmt.Printf("courseHandler: %s\n",r.URL.Path)
 	if strings.Contains(r.URL.Path,"submit"){
 		errorHandler(w,r,"Acceso no autorizado")
 		return
 	}
-
 	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
+	if rpath==""{
+		renderTemplate(w,r,"index",srv.Config)
+		return
+	}
 
 	if isDinamycUrl(rpath){
 		course,task:=srv.getCourseAndTask(rpath)
-		
 		if task!=nil{
 			//me piden tarea
 			renderTemplate(w,r,"task",task)
@@ -203,9 +209,9 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 			renderTemplate(w,r,"course",course)
 			return
 		}
-
-		//me piden el principal
-		renderTemplate(w,r,"index",srv.Config)
+	
+		errorHandler(w,r,"recurso desconocido")
+		return
 
 	}else{
 		rpath="srv/courses/"+rpath
@@ -219,6 +225,21 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
+
+	//fmt.Printf("packageHandler: %s\n",r.URL.Path)
+	rpath:=strings.TrimPrefix(r.URL.Path,"/package/")
+	if isDinamycUrl(rpath){
+		_,task:=srv.getCourseAndTask(rpath)
+		if task!=nil{
+			//me piden tarea
+			//renderTemplate(w,r,"task",task)
+			errorHandler(w,r,fmt.Sprintf("Quieres empaquetar la tarea: %s",task.Id))
+			return
+		}
+	}
+	errorHandler(w,r,"Tarea desconocida para paquetar")
+}
 
 
 func errorHandler(w http.ResponseWriter, r *http.Request, message string){

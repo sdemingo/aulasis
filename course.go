@@ -154,3 +154,52 @@ func LoadTask(course *Course,taskId string)(*Task){
 func (task *Task) CheckStatus(st string)(bool){
 	return task.Status==st
 }
+
+
+
+func (task *Task) Package(out string)(error){
+
+	tdir,err:=ioutil.TempDir("",task.Id)
+	if err!=nil{
+		return err
+	}
+	
+	dir,err:=os.Open(task.Course.BaseDir+"/"+task.Id)
+	if err!=nil{
+		return err
+	}
+
+	names,err:=dir.Readdirnames(-1)
+	if err!=nil{
+		return err
+	}
+
+	for i:=range names{
+		file:=task.Course.BaseDir+"/"+task.Id+"/"+names[i]
+		fmt.Printf("Packaging %s into %s\n",file,tdir)
+	}
+
+	// Delete Temp Dir
+	err=os.RemoveAll(tdir)
+	if err!=nil{
+		fmt.Printf("%v\n",err)
+	}
+
+	return nil
+}
+
+
+
+
+func copyFile(src,dest string)(error){
+	b,err:=ioutil.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	err=ioutil.WriteFile(dest,b,0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
