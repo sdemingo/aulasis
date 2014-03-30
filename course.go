@@ -157,14 +157,18 @@ func (task *Task) CheckStatus(st string)(bool){
 
 
 
-func (task *Task) Package(out string)(error){
+func (task *Task) Package()(error){
 
+	out,err:=ioutil.TempFile("",task.Id+"-pack")
+	if err!=nil{
+		return err
+	}
 	tdir,err:=ioutil.TempDir("",task.Id)
 	if err!=nil{
 		return err
 	}
 	
-	dir,err:=os.Open(task.Course.BaseDir+"/"+task.Id)
+	dir,err:=os.Open(task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id)
 	if err!=nil{
 		return err
 	}
@@ -174,9 +178,15 @@ func (task *Task) Package(out string)(error){
 		return err
 	}
 
+	fmt.Printf("Packaging task %s\n",task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id)
 	for i:=range names{
-		file:=task.Course.BaseDir+"/"+task.Id+"/"+names[i]
-		fmt.Printf("Packaging %s into %s\n",file,tdir)
+		file:=task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id+"/"+names[i]
+		info,err:=os.Stat(file)
+		if err==nil && info.IsDir()==false{
+			fmt.Printf("\tAdding %s\n",file)
+		}else{
+			fmt.Printf("\tIgnoring %s\n",file)
+		}
 	}
 
 	// Delete Temp Dir
@@ -184,6 +194,12 @@ func (task *Task) Package(out string)(error){
 	if err!=nil{
 		fmt.Printf("%v\n",err)
 	}
+
+	err=os.Rename(out.Name(),out.Name()+".zip")
+	if err!=nil{
+		fmt.Printf("%v\n",err)
+	}
+	fmt.Printf("Package %s is ready\n",out.Name()+".zip")
 
 	return nil
 }

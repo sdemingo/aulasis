@@ -235,6 +235,10 @@ func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 			//me piden tarea
 			//renderTemplate(w,r,"task",task)
 			errorHandler(w,r,fmt.Sprintf("Quieres empaquetar la tarea: %s",task.Id))
+			err:=task.Package()
+			if err!=nil{
+				fmt.Printf("%v\n",err)
+			}
 			return
 		}
 	}
