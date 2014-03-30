@@ -3,55 +3,56 @@ package main
 import (
 	"archive/zip"
 	"bytes"
-	"log"
 	"io/ioutil"
 	"os"
-	"fmt"
 	"strings"
 )
 
 
 
-func IterDirectory(rootPath string, dirPath string, z *zip.Writer ) {
+func IterDirectory(rootPath string, dirPath string, z *zip.Writer )(error) {
 	dir, err := os.Open(dirPath)
 	if err!=nil{
-		log.Fatal(err)
+		return err
 	}
 	defer dir.Close()
+
 	fis, err := dir.Readdir( 0 )
 	if err!=nil{
-		log.Fatal(err)
+		return err
 	}
 
 	for _, fi := range fis {
 		curPath := dirPath + "/" + fi.Name()
 		if fi.IsDir() {
-			IterDirectory(rootPath, curPath, z )
+			err:=IterDirectory(rootPath, curPath, z )
+			if err != nil {
+				return err
+			}
 		} else {
-			fmt.Printf( "adding... %s\n", curPath )
-
 			f, err := z.Create(strings.TrimPrefix(curPath,rootPath))
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			b, err := ioutil.ReadFile(curPath)
-			if err != nil { panic(err) }
-
-
+			if err != nil { 
+				return err
+			}
 			_, err = f.Write(b)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 			
 		}
 	}
+	return nil
 }
 
 
 // rootPath will be removed from the abs path before adding it to the zip file
 
-func Zip(outFilePath string, rootPath string, inPath string ) {
+func Zip(outFilePath string, rootPath string, inPath string )(error) {
 
 	// Create a buffer to write our archive to.
 	buf := new(bytes.Buffer)
@@ -59,19 +60,22 @@ func Zip(outFilePath string, rootPath string, inPath string ) {
 	// Create a new zip archive.
 	z := zip.NewWriter(buf)
 
-	IterDirectory(rootPath, inPath, z )
+	err:=IterDirectory(rootPath, inPath, z )
+	if err!=nil{
+		return err
+	}
 
-	err := z.Close()
+	err = z.Close()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	err = ioutil.WriteFile(outFilePath, buf.Bytes(), 0644)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	fmt.Println( "zip ok" )
+	return nil
 }
 
 

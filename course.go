@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"time"
+	"text/template"
 )
 
 
@@ -167,7 +168,11 @@ func (task *Task) Package()(error){
 	if err!=nil{
 		return err
 	}
-	
+	err=os.Mkdir(tdir+"/"+task.Id,0755)
+	if err!=nil{
+		return err
+	}
+
 	dir,err:=os.Open(task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id)
 	if err!=nil{
 		return err
@@ -178,16 +183,45 @@ func (task *Task) Package()(error){
 		return err
 	}
 
-	fmt.Printf("Packaging task %s\n",task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id)
+	taskdir:=task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id
+	fmt.Printf("Packaging task %s\n",taskdir)
+
+
+	f,err:=os.Create(tdir+"/info.html")
+	if err!=nil{
+		return err
+	}
+	t := template.Must(template.ParseFiles("views/local-task.html"))
+	err=t.Execute(f, task)
+	if err!=nil{
+		fmt.Printf("%v\n",err)
+	}
+	fmt.Printf("\tAdding %s\n",tdir+"/info.html")
+
+
+	copyFile(task.Course.BaseDir+"/resources/default.css",tdir+"/"+task.Id+"/default.css")
+	fmt.Printf("\tAdding %s\n",tdir+"/"+task.Id+"/default.css")
+
+	/*
+	 The Task directories should not have subdirectories. They are
+	 ignored during the packaging process
+	 */
+
 	for i:=range names{
-		file:=task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id+"/"+names[i]
+		file:=taskdir+"/"+names[i]
 		info,err:=os.Stat(file)
 		if err==nil && info.IsDir()==false{
 			fmt.Printf("\tAdding %s\n",file)
+			copyFile(file,tdir+"/"+task.Id+"/"+info.Name())
 		}else{
 			fmt.Printf("\tIgnoring %s\n",file)
 		}
 	}
+	
+
+
+	// Compress Temp Dir
+	Zip(out.Name()+".zip", tdir, tdir)
 
 	// Delete Temp Dir
 	err=os.RemoveAll(tdir)
@@ -195,12 +229,7 @@ func (task *Task) Package()(error){
 		fmt.Printf("%v\n",err)
 	}
 
-	err=os.Rename(out.Name(),out.Name()+".zip")
-	if err!=nil{
-		fmt.Printf("%v\n",err)
-	}
 	fmt.Printf("Package %s is ready\n",out.Name()+".zip")
-
 	return nil
 }
 
