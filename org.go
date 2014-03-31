@@ -74,7 +74,7 @@ func ParseProperty(content []byte, key string)(string){
 	if ((f==nil) || (len(f)<2)){
 		return ""
 	}
-	return strings.ToLower(strings.Trim(f[1]," \t"))
+	return strings.ToLower(strings.Trim(f[1]," \t\r\n"))
 }
 
 
