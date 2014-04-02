@@ -234,11 +234,16 @@ func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 		if task!=nil{
 			//me piden tarea
 			//renderTemplate(w,r,"task",task)
-			errorHandler(w,r,fmt.Sprintf("Quieres empaquetar la tarea: %s",task.Id))
-			err:=task.Package()
+			//errorHandler(w,r,fmt.Sprintf("Quieres empaquetar la tarea: %s",task.Id))
+			taskfile,err:=task.Package()
 			if err!=nil{
 				fmt.Printf("%v\n",err)
 			}
+
+			w.Header().Set("Content-type", "application/zip")
+			http.ServeFile(w, r, taskfile)
+			defer os.Remove(taskfile)
+
 			return
 		}
 	}

@@ -158,29 +158,30 @@ func (task *Task) CheckStatus(st string)(bool){
 
 
 
-func (task *Task) Package()(error){
+func (task *Task) Package()(file string,err error){
 
+	file=""
 	out,err:=ioutil.TempFile("",task.Id+"-pack")
 	if err!=nil{
-		return err
+		return
 	}
 	tdir,err:=ioutil.TempDir("",task.Id)
 	if err!=nil{
-		return err
+		return
 	}
 	err=os.Mkdir(tdir+"/"+task.Id,0755)
 	if err!=nil{
-		return err
+		return
 	}
 
 	dir,err:=os.Open(task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id)
 	if err!=nil{
-		return err
+		return
 	}
 
 	names,err:=dir.Readdirnames(-1)
 	if err!=nil{
-		return err
+		return
 	}
 
 	taskdir:=task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id
@@ -189,7 +190,7 @@ func (task *Task) Package()(error){
 
 	f,err:=os.Create(tdir+"/info.html")
 	if err!=nil{
-		return err
+		return
 	}
 	t := template.Must(template.ParseFiles("views/local-task.html"))
 	err=t.Execute(f, task)
@@ -221,7 +222,8 @@ func (task *Task) Package()(error){
 
 
 	// Compress Temp Dir
-	Zip(out.Name()+".zip", tdir, tdir)
+	file=out.Name()+".zip"
+	Zip(file, tdir, tdir)
 
 	// Delete Temp Dir
 	err=os.RemoveAll(tdir)
@@ -229,8 +231,8 @@ func (task *Task) Package()(error){
 		fmt.Printf("%v\n",err)
 	}
 
-	fmt.Printf("Package %s is ready\n",out.Name()+".zip")
-	return nil
+	fmt.Printf("Package %s is ready\n",file)
+	return
 }
 
 
