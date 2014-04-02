@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 	"text/template"
+	"path/filepath"
 )
 
 
@@ -166,10 +167,10 @@ func (task *Task) CheckStatus(st string)(bool){
 func (task *Task) Package()(file string,err error){
 
 	file=""
-	out,err:=ioutil.TempFile("",task.Id+"-pack")
+	/*out,err:=ioutil.TempFile("",task.Id+"-pack")
 	if err!=nil{
 		return
-	}
+	}*/
 	tdir,err:=ioutil.TempDir("",task.Id)
 	if err!=nil{
 		return
@@ -222,10 +223,8 @@ func (task *Task) Package()(file string,err error){
 		}
 	}
 	
-
-
 	// Compress Temp Dir
-	file=out.Name()+".zip"
+	file=filepath.Base(tdir)+".zip"
 	Zip(file, tdir, tdir)
 
 	// Delete Temp Dir

@@ -237,6 +237,7 @@ func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 			w.Header().Set("Content-Disposition", "attachment; filename="+task.Id+".zip")
 			w.Header().Set("Content-type", "application/zip")
 			http.ServeFile(w, r, taskfile)
+
 			defer os.Remove(taskfile)
 
 			return
