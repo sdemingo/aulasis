@@ -4,12 +4,12 @@ package main
 import (
 	"text/template"
 	"net/http"
-	"fmt"
 	"strings"
 	"os"
 	"io"
 	"time"
 	"regexp"
+	"log"
 )
 
 const MaxBytesBodySize=20*1024*1024
@@ -40,10 +40,10 @@ func CreateServer(dirpath string)(*Server, error){
 		return nil,err
 	}
 
-	config:=LoadServerConfig(srv.DirPath)
-	if config==nil{
-	  return nil,err
-	  }
+	config,err:=LoadServerConfig(srv.DirPath)
+	if err!=nil{
+		return nil,err
+	}
 
 	srv.Config=config
 	
@@ -175,9 +175,10 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	sr:=new (SubmitReport)
 	sr.Files=len(files)
 	sr.Stamp=time.Now()
-	sr.Addr=r.RemoteAddr
+	sr.Addr=getRequestIP(r)
 	sr.Task=task
 
+	log.Printf("Task %s submitted from %s\n",task.Title,getRequestIP(r))
 	renderTemplate(w,r,"submitted",sr)
 }
 
@@ -185,7 +186,6 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
-	//fmt.Printf("courseHandler: %s\n",r.URL.Path)
 	if strings.Contains(r.URL.Path,"submit"){
 		errorHandler(w,r,"Acceso no autorizado")
 		return
@@ -199,25 +199,22 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 	if isDinamycUrl(rpath){
 		course,task:=srv.getCourseAndTask(rpath)
 		if task!=nil{
-			//me piden tarea
 			renderTemplate(w,r,"task",task)
 			return
 		}
 
 		if course!=nil{
-			//me piden curso
 			renderTemplate(w,r,"course",course)
 			return
 		}
 	
 		errorHandler(w,r,"recurso desconocido")
 		return
-
 	}else{
 		rpath="srv/courses/"+rpath
 		info,err:=os.Stat(rpath)
 		if err!=nil || info.IsDir(){
-			renderTemplate(w,r,"error",nil)
+			errorHandler(w,r,err.Error())
 			return
 		}
 		http.ServeFile(w, r, rpath)
@@ -227,14 +224,14 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 
-	//fmt.Printf("packageHandler: %s\n",r.URL.Path)
+	log.Printf("Packaging request from %s\n",getRequestIP(r))
 	rpath:=strings.TrimPrefix(r.URL.Path,"/package/")
 	if isDinamycUrl(rpath){
 		_,task:=srv.getCourseAndTask(rpath)
 		if task!=nil{
 			taskfile,err:=task.Package()
 			if err!=nil{
-				fmt.Printf("%v\n",err)
+				log.Printf("Error: %v\n",err.Error())
 			}
 
 			w.Header().Set("Content-Disposition", "attachment; filename="+task.Id+".zip")
@@ -250,10 +247,12 @@ func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 
 
 func errorHandler(w http.ResponseWriter, r *http.Request, message string){
+
+	log.Printf("Error: %s from %s\n",message,getRequestIP(r))
 	t := template.Must(template.ParseFiles("views/error.html"))
 	err:=t.Execute(w, message)
 	if err!=nil{
-		fmt.Printf("%v\n",err)
+		log.Printf("%v\n",err)
 	}
 }
 
@@ -265,7 +264,7 @@ func renderTemplate(w http.ResponseWriter, r *http.Request,
 	t := template.Must(template.ParseFiles("views/"+name+".html"))
 	err:=t.Execute(w, cont)
 	if err!=nil{
-		fmt.Printf("%v\n",err)
+		log.Printf("%v\n",err)
 	}
 }
 
@@ -274,4 +273,10 @@ func renderTemplate(w http.ResponseWriter, r *http.Request,
 func isDinamycUrl(url string)(bool){
 	//ends with an .html extensions or is the root 
 	return url=="" || strings.HasSuffix(url,".html")
+}
+
+
+func getRequestIP(r *http.Request)(string){
+	f:=strings.Split(r.RemoteAddr,":")
+	return f[0]
 }

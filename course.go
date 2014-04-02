@@ -3,7 +3,7 @@ package main
 
 import (
 	"os"
-	"fmt"
+	"log"
 	"encoding/xml"
 	"io/ioutil"
 	"strings"
@@ -20,12 +20,11 @@ type ServerConfig struct{
 }
 
 
-func LoadServerConfig (dir string)(*ServerConfig){
+func LoadServerConfig (dir string)(*ServerConfig,error){
 
 	xmlFile, err := os.Open(dir+"/courses/meta.xml")
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return nil
+		return nil,err
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -35,8 +34,7 @@ func LoadServerConfig (dir string)(*ServerConfig){
 	config.DirPath=dir
 	err = xml.Unmarshal(b, &config)
 	if err != nil {
-		fmt.Printf("error: %v", err)
-		return nil
+		return nil,err
 	}
 
 	for c:=range config.Courses{
@@ -44,7 +42,7 @@ func LoadServerConfig (dir string)(*ServerConfig){
 		LoadCourse(dir, config.Courses[c])
 	}
 
-	return config
+	return config,nil
 }
 
 
@@ -74,12 +72,13 @@ type Course struct{
 	Tasks []*Task
 }
 
+
 func LoadCourse(basedir string, course *Course){
 
 	dirpath:=basedir+"/courses/"+course.Id
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
-		fmt.Printf("error: %v", err)
+		log.Printf("Error loading course %s: %v",course.Id, err)
 		return 
 	}
 
@@ -87,14 +86,21 @@ func LoadCourse(basedir string, course *Course){
 	course.BaseDir=basedir
 
 	for i:=range infos{
-		t:=LoadTask(course,infos[i].Name())
+		t,err:=LoadTask(course,infos[i].Name())
+		if err!=nil{
+			log.Printf("Error loading task %s\n",infos[i].Name())
+		}
 		course.Tasks[i]=t  //maybe nill
 	}
 }
 
 
 func (c *Course) GetTaskById(id string)(*Task){
-	return LoadTask(c,id)
+	t,err:=LoadTask(c,id)
+	if err!=nil{
+		log.Printf("Error loading task %s\n",id)
+	}
+	return t
 }
 
 
@@ -127,12 +133,11 @@ type SubmitReport struct{
 }
 
 
-func LoadTask(course *Course,taskId string)(*Task){
+func LoadTask(course *Course,taskId string)(*Task,error){
 	orgfile:=course.BaseDir+"/courses/"+course.Id+"/"+taskId+"/info.org"
 	orgFile, err := os.Open(orgfile)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return nil
+		return nil,err
 	}
 	defer orgFile.Close()
 
@@ -148,7 +153,7 @@ func LoadTask(course *Course,taskId string)(*Task){
 		task.Status=TASK_CLOSED_STATUS
 	}
 
-	return task
+	return task,nil
 }
 
 
@@ -185,8 +190,7 @@ func (task *Task) Package()(file string,err error){
 	}
 
 	taskdir:=task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id
-	fmt.Printf("Packaging task %s\n",taskdir)
-
+	//log.Printf("Packaging task %s\n",taskdir)
 
 	f,err:=os.Create(tdir+"/info.html")
 	if err!=nil{
@@ -195,13 +199,12 @@ func (task *Task) Package()(file string,err error){
 	t := template.Must(template.ParseFiles("views/local-task.html"))
 	err=t.Execute(f, task)
 	if err!=nil{
-		fmt.Printf("%v\n",err)
+		return
 	}
-	fmt.Printf("\tAdding %s\n",tdir+"/info.html")
-
+	//log.Printf("\tAdding %s\n",tdir+"/info.html")
 
 	copyFile(task.Course.BaseDir+"/resources/default.css",tdir+"/"+task.Id+"/default.css")
-	fmt.Printf("\tAdding %s\n",tdir+"/"+task.Id+"/default.css")
+	//log.Printf("\tAdding %s\n",tdir+"/"+task.Id+"/default.css")
 
 	/*
 	 The Task directories should not have subdirectories. They are
@@ -212,10 +215,10 @@ func (task *Task) Package()(file string,err error){
 		file:=taskdir+"/"+names[i]
 		info,err:=os.Stat(file)
 		if err==nil && info.IsDir()==false{
-			fmt.Printf("\tAdding %s\n",file)
+			//log.Printf("\tAdding %s\n",file)
 			copyFile(file,tdir+"/"+task.Id+"/"+info.Name())
 		}else{
-			fmt.Printf("\tIgnoring %s\n",file)
+			//log.Printf("\tIgnoring %s\n",file)
 		}
 	}
 	
@@ -226,13 +229,9 @@ func (task *Task) Package()(file string,err error){
 	Zip(file, tdir, tdir)
 
 	// Delete Temp Dir
-	err=os.RemoveAll(tdir)
-	if err!=nil{
-		fmt.Printf("%v\n",err)
-	}
+	defer os.RemoveAll(tdir)
 
-	fmt.Printf("Package %s is ready\n",file)
-	return
+	return				    
 }
 
 

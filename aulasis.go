@@ -1,11 +1,12 @@
 package main
 
-import "fmt"
+import "log"
+
 
 func main() {
 	srv,err:=CreateServer("./srv")
 	if err!=nil{
-		panic(fmt.Sprintf("%v\n",err))
+		log.Panic(err)
 	}
 	srv.Start()
 }
