@@ -197,7 +197,7 @@ func (task *Task) Package()(file string,err error){
 	if err!=nil{
 		return
 	}
-	t := template.Must(template.ParseFiles("views/local-task.html"))
+	t := template.Must(template.ParseFiles(ResourcesDir+"/templates/local-task.html"))
 	err=t.Execute(f, task)
 	if err!=nil{
 		return

@@ -241,7 +241,7 @@ func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 func errorHandler(w http.ResponseWriter, r *http.Request, message string){
 
 	log.Printf("Error: %s from %s\n",message,getRequestIP(r))
-	t := template.Must(template.ParseFiles("views/error.html"))
+	t := template.Must(template.ParseFiles(ResourcesDir+"/templates/error.html"))
 	err:=t.Execute(w, message)
 	if err!=nil{
 		log.Printf("%v\n",err)
@@ -253,7 +253,7 @@ func renderTemplate(w http.ResponseWriter, r *http.Request,
 	name string,
 	cont interface{}) {
 
-	t := template.Must(template.ParseFiles("views/"+name+".html"))
+	t := template.Must(template.ParseFiles(ResourcesDir+"/templates/"+name+".html"))
 	err:=t.Execute(w, cont)
 	if err!=nil{
 		log.Printf("%v\n",err)
