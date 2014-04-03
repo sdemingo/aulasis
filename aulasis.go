@@ -1,10 +1,24 @@
 package main
 
-import "log"
-
+import (
+	"log"
+	"bitbucket.org/kardianos/osext"
+	"strings"
+)
 
 func main() {
-	srv,err:=CreateServer("./resources","./courses")
+
+	execpath,err:=osext.ExecutableFolder()
+	if err!=nil{
+		log.Panic(err)
+	}	
+	execpath=strings.TrimRight(execpath,"/")
+
+	// By now, courses are in the same folder that exec file but
+	// in the future it has been input by a flag
+	docpath:=execpath+"/courses"
+
+	srv,err:=CreateServer(execpath+"/resources",docpath)
 	if err!=nil{
 		log.Panic(err)
 	}
