@@ -13,7 +13,7 @@ import (
 )
 
 const MaxBytesBodySize=20*1024*1024
-const CoursesDir="./srv/courses"
+const ResourcesDir="./resources"
 
 
 
@@ -30,12 +30,12 @@ func CreateServer(dirpath string)(*Server, error){
 	srv:=new(Server)
 	srv.DirPath=strings.TrimRight(dirpath,"/")
 
-	_,err:=os.Stat(dirpath+"/courses")
+	_,err:=os.Stat(dirpath)
 	if err!=nil{
 		return nil,err
 	}
 
-	_,err=os.Stat(dirpath+"/resources")
+	_,err=os.Stat(ResourcesDir)
 	if err!=nil{
 		return nil,err
 	}
@@ -52,7 +52,7 @@ func CreateServer(dirpath string)(*Server, error){
 
 
 func (srv *Server) Start(){
-	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("srv/resources")))) 
+	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir(ResourcesDir)))) 
 
 	http.HandleFunc("/package/",srv.packageHandler)
 	http.HandleFunc("/courses/",srv.coursesHandler)
@@ -122,24 +122,20 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir:=CoursesDir+"/"+task.Course.Id+"/"+task.Id+"/submitted/"+name+"-"+surname
+	dir:=srv.DirPath+"/"+task.Course.Id+"/"+task.Id+"/submitted/"+name+"-"+surname
 	err:=os.MkdirAll(dir,0755)	
 	if name=="" || surname==""{
 		errorHandler(w,r,err.Error())
 		return
 	}
 
-	//parse the multipart form in the request
 	err = r.ParseMultipartForm(MaxBytesBodySize)
 	if err != nil {
 		errorHandler(w,r,err.Error())
 		return
 	}
-	
-	//get a ref to the parsed multipart form
 	m := r.MultipartForm
-	
-	//get the *fileheaders
+
 	files := m.File["files"]
 	if err != nil {
 		errorHandler(w,r,err.Error())
@@ -147,7 +143,6 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i, _ := range files {
-		//for each fileheader, get a handle to the actual file
 		file, err := files[i].Open()
 		defer file.Close()
 		if err != nil {
@@ -155,8 +150,6 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-
-		//create destination file making sure the path is writeable.
 		dst, err := os.Create(dir+"/"+files[i].Filename)
 		defer dst.Close()
 		if err != nil {
@@ -164,8 +157,6 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-
-		//copy the uploaded file to the destination file
 		if _, err := io.Copy(dst, file); err != nil {
 			errorHandler(w,r,err.Error())
 			return
@@ -211,7 +202,7 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 		errorHandler(w,r,"recurso desconocido")
 		return
 	}else{
-		rpath="srv/courses/"+rpath
+		rpath=srv.DirPath+"/"+rpath
 		info,err:=os.Stat(rpath)
 		if err!=nil || info.IsDir(){
 			errorHandler(w,r,err.Error())

@@ -23,7 +23,7 @@ type ServerConfig struct{
 
 func LoadServerConfig (dir string)(*ServerConfig,error){
 
-	xmlFile, err := os.Open(dir+"/courses/meta.xml")
+	xmlFile, err := os.Open(dir+"/meta.xml")
 	if err != nil {
 		return nil,err
 	}
@@ -76,7 +76,7 @@ type Course struct{
 
 func LoadCourse(basedir string, course *Course){
 
-	dirpath:=basedir+"/courses/"+course.Id
+	dirpath:=basedir+"/"+course.Id
 	infos,err:=ioutil.ReadDir(dirpath)
 	if err != nil {
 		log.Printf("Error loading course %s: %v",course.Id, err)
@@ -135,7 +135,7 @@ type SubmitReport struct{
 
 
 func LoadTask(course *Course,taskId string)(*Task,error){
-	orgfile:=course.BaseDir+"/courses/"+course.Id+"/"+taskId+"/info.org"
+	orgfile:=course.BaseDir+"/"+course.Id+"/"+taskId+"/info.org"
 	orgFile, err := os.Open(orgfile)
 	if err != nil {
 		return nil,err
@@ -180,7 +180,7 @@ func (task *Task) Package()(file string,err error){
 		return
 	}
 
-	dir,err:=os.Open(task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id)
+	dir,err:=os.Open(task.Course.BaseDir+"/"+task.Course.Id+"/"+task.Id)
 	if err!=nil{
 		return
 	}
@@ -190,7 +190,7 @@ func (task *Task) Package()(file string,err error){
 		return
 	}
 
-	taskdir:=task.Course.BaseDir+"/courses/"+task.Course.Id+"/"+task.Id
+	taskdir:=task.Course.BaseDir+"/"+task.Course.Id+"/"+task.Id
 	//log.Printf("Packaging task %s\n",taskdir)
 
 	f,err:=os.Create(tdir+"/info.html")
@@ -204,7 +204,7 @@ func (task *Task) Package()(file string,err error){
 	}
 	//log.Printf("\tAdding %s\n",tdir+"/info.html")
 
-	copyFile(task.Course.BaseDir+"/resources/default.css",tdir+"/"+task.Id+"/default.css")
+	copyFile(ResourcesDir+"/css/default.css",tdir+"/"+task.Id+"/default.css")
 	//log.Printf("\tAdding %s\n",tdir+"/"+task.Id+"/default.css")
 
 	/*
