@@ -12,7 +12,7 @@ func main() {
 	if err!=nil{
 		log.Panic(err)
 	}	
-	execpath=strings.TrimRight(execpath,"/")
+	execpath=strings.TrimRight(execpath,"/\\")
 
 	// By now, courses are in the same folder that exec file but
 	// in the future it has been input by a flag
