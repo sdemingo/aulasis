@@ -22,17 +22,17 @@ var linkReg = regexp.MustCompile("\\[\\[(?P<url>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\
 var localLinkReg = regexp.MustCompile("\\[\\[file:(?P<src>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\\]\\]")
 var imgReg = regexp.MustCompile("\\[\\[(?P<src>[^\\]]+)\\]\\]")
 
-var codeReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\n(?P<code>(?s)[^\\#]+)^\\#\\+END_SRC\\n")
-var codeHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\n")
-var codeFooterReg = regexp.MustCompile("(?m)^\\#\\+END_SRC\\n")
+var codeReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\r*\\n(?P<code>(?s)[^\\#]+)^\\#\\+END_SRC\\r*\\n")
+var codeHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\r*\\n")
+var codeFooterReg = regexp.MustCompile("(?m)^\\#\\+END_SRC\\r*\\n")
 
-var quoteReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_QUOTE\\n")
-var quoteHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\n")
-var quoteFooterReg = regexp.MustCompile("(?m)^\\#\\+END_QUOTE\\n")
+var quoteReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\r*\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_QUOTE\\r*\\n")
+var quoteHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\r*\\n")
+var quoteFooterReg = regexp.MustCompile("(?m)^\\#\\+END_QUOTE\\r*\\n")
 
-var centerReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_CENTER\\n")
-var centerHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\n")
-var centerFooterReg = regexp.MustCompile("(?m)^\\#\\+END_CENTER\\n")
+var centerReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\r*\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_CENTER\\r*\\n")
+var centerHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\r*\\n")
+var centerFooterReg = regexp.MustCompile("(?m)^\\#\\+END_CENTER\\r*\\n")
 
 var parReg = regexp.MustCompile("\\n\\n+(?P<text>[^\\n]+)")
 var allPropsReg = regexp.MustCompile(":PROPERTIES:(?s).+:END:")
