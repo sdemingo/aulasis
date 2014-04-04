@@ -21,10 +21,10 @@ estos encontramos otro nivel de directorios correspondiente a las **actividades*
   courses/
      |--- curso1/
            |--- actividad1/
-                 |--- info.org
+                 |--- info.md
                  |--- imagen.jpg
            |--- actividad2/
-                 |---  info.org
+                 |---  info.md
      |--- curso2/
                ....
      |--- meta.xml
