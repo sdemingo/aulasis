@@ -109,7 +109,7 @@ func (c *Course) GetTaskById(id string)(*Task){
 
 
 const TASK_OPEN_STATUS = "open"
-const TASK_CLOSED_STATUS = "closed"
+const TASK_CLOSED_STATUS = "close"
 const TASK_HIDE_STATUS = "hide"
 
 
@@ -145,14 +145,18 @@ func LoadTask(course *Course,taskId string)(*Task,error){
 	b, _ := ioutil.ReadAll(orgFile)
 
 	task:=new(Task)
+	task.Content=GetContentHTML(b)
 	task.Id=taskId
 	task.Title=GetContentTitle(b)
 	task.Course=course
 	task.Status=GetProperty(b,"status")
-	if task.Status==""{
-		task.Status=TASK_CLOSED_STATUS
+	if task.Status!=TASK_CLOSED_STATUS && 
+		task.Status!=TASK_OPEN_STATUS && 
+		task.Status!=TASK_HIDE_STATUS {
+		
+		task.Status=TASK_CLOSED_STATUS  //by default
+		log.Printf("Error: task file %s has a bad status property\n",task.Id)
 	}
-	task.Content=GetContentHTML(b)
 
 	return task,nil
 }
@@ -167,10 +171,7 @@ func (task *Task) CheckStatus(st string)(bool){
 func (task *Task) Package()(file string,err error){
 
 	file=""
-	/*out,err:=ioutil.TempFile("",task.Id+"-pack")
-	if err!=nil{
-		return
-	}*/
+
 	tdir,err:=ioutil.TempDir("",task.Id)
 	if err!=nil{
 		return
@@ -191,8 +192,6 @@ func (task *Task) Package()(file string,err error){
 	}
 
 	taskdir:=task.Course.BaseDir+"/"+task.Course.Id+"/"+task.Id
-	//log.Printf("Packaging task %s\n",taskdir)
-
 	f,err:=os.Create(tdir+"/info.html")
 	if err!=nil{
 		return
@@ -202,10 +201,7 @@ func (task *Task) Package()(file string,err error){
 	if err!=nil{
 		return
 	}
-	//log.Printf("\tAdding %s\n",tdir+"/info.html")
-
 	copyFile(ResourcesDir+"/css/default.css",tdir+"/"+task.Id+"/default.css")
-	//log.Printf("\tAdding %s\n",tdir+"/"+task.Id+"/default.css")
 
 	/*
 	 The Task directories should not have subdirectories. They are
@@ -216,18 +212,13 @@ func (task *Task) Package()(file string,err error){
 		file:=taskdir+"/"+names[i]
 		info,err:=os.Stat(file)
 		if err==nil && info.IsDir()==false{
-			//log.Printf("\tAdding %s\n",file)
 			copyFile(file,tdir+"/"+task.Id+"/"+info.Name())
-		}else{
-			//log.Printf("\tIgnoring %s\n",file)
 		}
 	}
 	
-	// Compress Temp Dir
 	file=filepath.Base(tdir)+".zip"
 	Zip(file, tdir, tdir)
 
-	// Delete Temp Dir
 	defer os.RemoveAll(tdir)
 
 	return				    
