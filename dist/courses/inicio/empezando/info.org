@@ -13,10 +13,18 @@ parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae
 dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam
 rutrum. Nam vestibulum accumsan nisl.
 
+#+BEGIN_SRC orgmode
+    * Ejemplo de código en org
+    :PROPERTIES: 
+    :Status:   closed 
+    :END:
+
+    lalalalala 
+#+END_SRC
+
 ** Subtitulo de nivel 2
 
 Pruebo también a meter una lista de enlaces:
   - Este es un [[http://www.google.com][enlace externo]]
-
 
 

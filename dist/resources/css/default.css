@@ -111,6 +111,17 @@ main h2{
     border-bottom:1px solid grey;
 }
 
+main pre {
+    width:500px;
+    margin:0 auto;
+
+    padding-left:10px;
+    background-color:white;
+    border: 1px double #ccc;
+    font-family: monospace;
+    font-size:100%;
+}
+
 
 main img{
     width:60%;
@@ -209,7 +220,7 @@ footer{
 
 
     line-height:40px;
- 
+    
     color:grey;
     background-color: 	#E8E8E8 ;
     border-top:1px solid grey;
