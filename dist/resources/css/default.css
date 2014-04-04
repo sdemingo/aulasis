@@ -118,6 +118,10 @@ main pre{
     border: 1px double grey;
 }
 
+main pre{
+    padding:10px;
+}
+
 main pre>code{
     font-family: monospace;
 }
