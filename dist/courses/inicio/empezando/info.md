@@ -6,8 +6,8 @@ Properties:
 # Empezando con Aulasis
 
 Aulasis te permitirá gestionar el flujo de trabajo habitual de un aula
-exportando tareas previante editadas por ti a los alumnos a través de sus
-navegadores, y recibir las soluciones de estos enviadas a tí a través de un
+exportando tareas previamente editadas por ti a los alumnos a través de sus
+navegadores, y recibir las soluciones de estos enviadas a ti a través de un
 sencillo formulario.
 
 Aulasis mantiene la información almacenada a dos niveles en el sistema de
@@ -61,7 +61,7 @@ siguientes:
 
    - **open**: Una tarea abierta es pública y ofrece un formulario en
        la parte inferior para enviar archivos al sistema.
-   - **closed**: Una tarea cerrada es pública pero no permite el envio
+   - **closed**: Una tarea cerrada es pública pero no permite el envío
        de ficheros.
    - **hide**: Una tarea oculta no muestra su contenido ni se lista al
        cargar el curso.
@@ -81,7 +81,7 @@ que quieres servir junto con esta: imágenes, ficheros con código,
 archivos PDF, etc. Para enlazar los recursos estáticos servidos dentro
 de cada carpeta de actividad hemos de tener en cuenta que la ruta de
 estos ha de comenzar por `/courses/dirCurso/dirTarea`. Si por ejemplo
-quisieramos visualizar una imagen contenida dentro del directorio de
+quisiéramos visualizar una imagen contenida dentro del directorio de
 esta actividad escribiríamos:
 
 ```
