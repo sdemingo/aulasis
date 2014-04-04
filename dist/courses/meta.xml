@@ -6,18 +6,20 @@
 
 
   <course>
-    <name>Modulo 1</name>
-    <path>modulo1</path>
+    <name>Inicio</name>
+    <path>inicio</path>
     <description>
-      Breve descripción del módulo 1
+      Bienvenido a Aulasis. Este curso ha sido creado para orientarte en los
+      primeros pasos con la plataforma y servirte de ayuda para empezar a crear
+      y gestionar tareas.
     </description>
   </course>
 
   <course>
-    <name>Modulo 2</name>
-    <path>modulo2</path>
+    <name>Modulo 1</name>
+    <path>modulo1</path>
     <description>
-      Breve descripción del módulo 2
+      Breve descripción del módulo 1
     </description>
   </course>
 

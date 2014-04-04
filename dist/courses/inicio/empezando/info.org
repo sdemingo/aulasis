@@ -1,11 +1,22 @@
-#+TITLE: Título de la actividad
+#+TITLE: Primeros pasos
+
+* Empezando con Aulasis
+:PROPERTIES:
+:Status: closed
+:END:
 
 
-* Texto descriptivo de la actividad
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec hendrerit tempor
+Lorem ipsum dolor sit amet, aaaaaaaaa consectetuer adipiscing elit. Donec hendrerit tempor
 tellus. Donec pretium posuere tellus. Proin quam nisl, tincidunt et, mattis
 eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis
 parturient montes, nascetur ridiculus mus. Nulla posuere. Donec vitae
 dolor. Nullam tristique diam non turpis. Cras placerat accumsan nulla. Nullam
 rutrum. Nam vestibulum accumsan nisl.
+
+** Subtitulo de nivel 2
+
+Pruebo también a meter una lista de enlaces:
+  - Este es un [[http://www.google.com][enlace externo]]
+
+
+
