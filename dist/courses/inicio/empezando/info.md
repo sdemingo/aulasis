@@ -59,9 +59,12 @@ Para cada actividad, por ahora la única propiedad válida es su
 estado. El estado de una actividad o tarea puede estar este entre los
 siguientes:
 
-   - **open**: Una tarea abierta es pública y ofrece un formulario en la parte inferior para enviar archivos al sistema.
-   - **closed**: Una tarea cerrada es pública pero no permite el envio de ficheros.
-   - **hide**: Una tarea oculta no muestra su contenido ni se lista al cargar el curso.
+   - **open**: Una tarea abierta es pública y ofrece un formulario en
+       la parte inferior para enviar archivos al sistema.
+   - **closed**: Una tarea cerrada es pública pero no permite el envio
+       de ficheros.
+   - **hide**: Una tarea oculta no muestra su contenido ni se lista al
+       cargar el curso.
 
 Para definir, por ejemplo, el estado de una tarea como abierta (open)
 hemos de incluir la siguiente linea en nuestro fichero `info.md`:
@@ -73,8 +76,18 @@ hemos de incluir la siguiente linea en nuestro fichero `info.md`:
   -->
 ```
 
-Dentro del directorio de la actividad podemos meter todos los ficheros que
-quieres servir junto con esta: imágenes, ficheros con código, archivos PDF,
-etc. Los ficheros enviados por los alumnos a través del formulario de entrega
+Dentro del directorio de la actividad podemos meter todos los ficheros
+que quieres servir junto con esta: imágenes, ficheros con código,
+archivos PDF, etc. Para enlazar los recursos estáticos servidos dentro
+de cada carpeta de actividad hemos de tener en cuenta que la ruta de
+estos ha de comenzar por `/courses/dirCurso/dirTarea`. Si por ejemplo
+quisieramos visualizar una imagen contenida dentro del directorio de
+esta actividad escribiríamos:
+
+```
+![Alt text](/courses/inicio/empezando/imagen.jpg)
+```
+
+ Los ficheros enviados por los alumnos a través del formulario de entrega
 (mostrado solo en tareas abiertas) son almacenados bajo el mismo directorio
 donde se ha definido la actividad, en un subdirectorio llamado `submitted`.
