@@ -1,4 +1,7 @@
+<!---
+Properties:
 @>status:closed
+-->
 
 # Empezando con Aulasis
 
@@ -64,7 +67,10 @@ Para definir, por ejemplo, el estado de una tarea como abierta (open)
 hemos de incluir la siguiente linea en nuestro fichero `info.md`:
 
 ```
+ <!---
+ Properties:
  @>status:open
+  -->
 ```
 
 Dentro del directorio de la actividad podemos meter todos los ficheros que
