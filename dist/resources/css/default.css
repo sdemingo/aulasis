@@ -111,17 +111,23 @@ main h2{
     border-bottom:1px solid grey;
 }
 
-main pre {
+main pre{
     width:500px;
     margin:0 auto;
-
-    padding-left:10px;
     background-color:white;
-    border: 1px double #ccc;
-    font-family: monospace;
-    font-size:100%;
+    border: 1px double grey;
 }
 
+main pre>code{
+    font-family: monospace;
+}
+
+main p>code{
+    padding-left:5px;
+    padding-right:5px;
+    border:1px solid silver;
+    font-family: monospace;
+}
 
 main img{
     width:60%;
