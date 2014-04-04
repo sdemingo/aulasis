@@ -22,22 +22,22 @@ var linkReg = regexp.MustCompile("\\[\\[(?P<url>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\
 var localLinkReg = regexp.MustCompile("\\[\\[file:(?P<src>[^\\]]+)\\]\\[(?P<text>[^\\]]+)\\]\\]")
 var imgReg = regexp.MustCompile("\\[\\[(?P<src>[^\\]]+)\\]\\]")
 
-var codeReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\r*\\n(?P<code>(?s)[^\\#]+)^\\#\\+END_SRC\\r*\\n")
-var codeHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\r*\\n")
-var codeFooterReg = regexp.MustCompile("(?m)^\\#\\+END_SRC\\r*\\n")
+var codeReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\r?\\n(?P<code>(?s)[^\\#]+)^\\#\\+END_SRC\\r?\\n")
+var codeHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_SRC \\w*\\r?\\n")
+var codeFooterReg = regexp.MustCompile("(?m)^\\#\\+END_SRC\\r?\\n")
 
-var quoteReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\r*\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_QUOTE\\r*\\n")
-var quoteHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\r*\\n")
-var quoteFooterReg = regexp.MustCompile("(?m)^\\#\\+END_QUOTE\\r*\\n")
+var quoteReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\r?\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_QUOTE\\r?\\n")
+var quoteHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_QUOTE\\s*\\r?\\n")
+var quoteFooterReg = regexp.MustCompile("(?m)^\\#\\+END_QUOTE\\r?\\n")
 
-var centerReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\r*\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_CENTER\\r*\\n")
-var centerHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\r*\\n")
-var centerFooterReg = regexp.MustCompile("(?m)^\\#\\+END_CENTER\\r*\\n")
+var centerReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\r?\\n(?P<cite>(?s)[^\\#]+)^\\#\\+END_CENTER\\r?\\n")
+var centerHeaderReg = regexp.MustCompile("(?m)^\\#\\+BEGIN_CENTER\\s*\\r?\\n")
+var centerFooterReg = regexp.MustCompile("(?m)^\\#\\+END_CENTER\\r?\\n")
 
-var parReg = regexp.MustCompile("\\n\\n+(?P<text>[^\\n]+)")
+var parReg = regexp.MustCompile("\\r?\\n\\r?\\n+(?P<text>[^\\n]+)")
 var allPropsReg = regexp.MustCompile(":PROPERTIES:(?s).+:END:")
 var rawHTML = regexp.MustCompile("\\<A-Za-z[^\\>]+\\>")
-var orgHeader = regexp.MustCompile("(?m)^\\s*\\#\\+.+:\\s*.*\\n")
+var orgHeader = regexp.MustCompile("(?m)^\\s*\\#\\+.+:\\s*.*\\r?\\n")
 
 //estilos de texto
 var boldReg = regexp.MustCompile("(?P<prefix>[\\s|\\W]+)\\*(?P<text>[^\\s][^\\*]+)\\*(?P<suffix>[\\s|\\W]*)")
@@ -48,8 +48,8 @@ var strikeReg = regexp.MustCompile("(?P<prefix>[\\s|[\\W]+)\\+(?P<text>[^\\s][^\
 
 
 // listas
-var ulistItemReg = regexp.MustCompile("(?m)^\\s*[\\+|\\-]\\s+(?P<item>.+)\\n")
-var olistItemReg = regexp.MustCompile("(?m)^\\s*[0-9]+\\.\\s+(?P<item>.+)\\n")
+var ulistItemReg = regexp.MustCompile("(?m)^\\s*[\\+|\\-]\\s+(?P<item>.+)\\r?\\n")
+var olistItemReg = regexp.MustCompile("(?m)^\\s*[0-9]+\\.\\s+(?P<item>.+)\\r?\\n")
 var ulistReg = regexp.MustCompile("(?P<items>(\\<fake-uli\\>.+\\n)+)")
 var olistReg = regexp.MustCompile("(?P<items>(\\<fake-oli\\>.+\\n)+)")
 
