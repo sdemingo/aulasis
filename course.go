@@ -135,7 +135,7 @@ type SubmitReport struct{
 
 
 func LoadTask(course *Course,taskId string)(*Task,error){
-	orgfile:=course.BaseDir+"/"+course.Id+"/"+taskId+"/info.org"
+	orgfile:=course.BaseDir+"/"+course.Id+"/"+taskId+"/info.md"
 	orgFile, err := os.Open(orgfile)
 	if err != nil {
 		return nil,err
@@ -145,14 +145,14 @@ func LoadTask(course *Course,taskId string)(*Task,error){
 	b, _ := ioutil.ReadAll(orgFile)
 
 	task:=new(Task)
-	task.Content=Org2HTML(b,taskId)
 	task.Id=taskId
-	task.Title=ParseHeader(b,"TITLE")
+	task.Title=GetContentTitle(b)
 	task.Course=course
-	task.Status=ParseProperty(b,"status")
+	task.Status=GetProperty(b,"status")
 	if task.Status==""{
 		task.Status=TASK_CLOSED_STATUS
 	}
+	task.Content=GetContentHTML(b)
 
 	return task,nil
 }
