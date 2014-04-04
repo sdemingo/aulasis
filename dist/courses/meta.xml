@@ -1,10 +1,6 @@
 <serverconfig>
-
   <config>
-
   </config>
-
-
   <course>
     <name>Inicio</name>
     <path>inicio</path>
@@ -14,13 +10,4 @@
       y gestionar tareas.
     </description>
   </course>
-
-  <course>
-    <name>Modulo 1</name>
-    <path>modulo1</path>
-    <description>
-      Breve descripción del módulo 1
-    </description>
-  </course>
-
 </serverconfig>
