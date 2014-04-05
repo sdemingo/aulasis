@@ -1,6 +1,6 @@
 <!---
 Properties:
-@>status:closed
+@>status:close
 -->
 
 # Empezando con Aulasis
