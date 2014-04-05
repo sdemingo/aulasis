@@ -10,6 +10,7 @@ import (
 	"time"
 	"regexp"
 	"log"
+	"fmt"
 )
 
 const MaxBytesBodySize=20*1024*1024
@@ -53,7 +54,7 @@ func CreateServer(respath string,dirpath string)(*Server, error){
 }
 
 
-func (srv *Server) Start(){
+func (srv *Server) Start(port int){
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir(srv.ResourcesPath)))) 
 
 	http.HandleFunc("/package/",srv.packageHandler)
@@ -61,7 +62,8 @@ func (srv *Server) Start(){
 	http.HandleFunc("/submit/",srv.submitHandler)
 	http.HandleFunc("/",srv.rootHandler)
 
-	http.ListenAndServe(":9090", nil)
+	
+	http.ListenAndServe(fmt.Sprintf(":%d",port), nil)
 }
 
 
