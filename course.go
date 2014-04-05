@@ -10,6 +10,7 @@ import (
 	"time"
 	"text/template"
 	"path/filepath"
+	"regexp"
 )
 
 
@@ -196,6 +197,11 @@ func (task *Task) Package()(file string,err error){
 	if err!=nil{
 		return
 	}
+
+	// Replace remote links to local links before apply the template
+	linksReg:=regexp.MustCompile("=\"/courses/[^/]+/[^/]+/")
+	task.Content=linksReg.ReplaceAllString(task.Content,"=\""+task.Id+"/")
+
 	t := template.Must(template.ParseFiles(ResourcesDir+"/templates/local-task.html"))
 	err=t.Execute(f, task)
 	if err!=nil{
