@@ -16,6 +16,9 @@ import (
 const MaxBytesBodySize=20*1024*1024
 var ResourcesDir string
 
+const ErrorTaskNotSubmitted="Tarea no entregada"
+const ErrorResourceUnknown="Pedido recurso desconocido"
+
 
 type Server struct{
 	ResourcesPath string
@@ -115,34 +118,34 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	if isDinamycUrl(rpath){
 		_,task=srv.getCourseAndTask(rpath)
 	}else{
-		srv.errorHandler(w,r,"Bad submit request")
+		srv.errorHandler(w,r,ErrorTaskNotSubmitted,nil)
 	}
 
 	name:=cleanName(strings.ToLower(r.FormValue("name")))
 	surname:=cleanName(r.FormValue("surname"))
 
 	if name=="" || surname==""{
-		srv.errorHandler(w,r,"Bad parametres in request")
+		srv.errorHandler(w,r,ErrorTaskNotSubmitted,nil)
 		return
 	}
 
 	dir:=srv.DirPath+"/"+task.Course.Id+"/"+task.Id+"/submitted/"+name+"-"+surname
 	err:=os.MkdirAll(dir,0755)	
-	if name=="" || surname==""{
-		srv.errorHandler(w,r,err.Error())
+	if err!=nil{
+		srv.errorHandler(w,r,ErrorTaskNotSubmitted,err)
 		return
 	}
 
 	err = r.ParseMultipartForm(MaxBytesBodySize)
 	if err != nil {
-		srv.errorHandler(w,r,err.Error())
+		srv.errorHandler(w,r,ErrorTaskNotSubmitted,err)
 		return
 	}
 	m := r.MultipartForm
 
 	files := m.File["files"]
 	if err != nil {
-		srv.errorHandler(w,r,err.Error())
+		srv.errorHandler(w,r,ErrorTaskNotSubmitted,err)
 		return
 	}
 
@@ -150,7 +153,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		file, err := files[i].Open()
 		defer file.Close()
 		if err != nil {
-			srv.errorHandler(w,r,err.Error())
+			srv.errorHandler(w,r,ErrorTaskNotSubmitted,err)
 			return
 		}
 
@@ -162,7 +165,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if _, err := io.Copy(dst, file); err != nil {
-			srv.errorHandler(w,r,err.Error())
+			srv.errorHandler(w,r,ErrorTaskNotSubmitted,err)
 			return
 		}		
 	}
@@ -182,7 +185,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 	if strings.Contains(r.URL.Path,"submit"){
-		srv.errorHandler(w,r,"Acceso no autorizado")
+		srv.errorHandler(w,r, ErrorResourceUnknown,nil)
 		return
 	}
 	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
@@ -203,13 +206,13 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	
-		srv.errorHandler(w,r,"recurso desconocido")
+		srv.errorHandler(w,r, ErrorResourceUnknown,nil)
 		return
 	}else{
 		rpath=srv.DirPath+"/"+rpath
 		info,err:=os.Stat(rpath)
 		if err!=nil || info.IsDir(){
-			srv.errorHandler(w,r,err.Error())
+			srv.errorHandler(w,r, ErrorResourceUnknown,err)
 			return
 		}
 		http.ServeFile(w, r, rpath)
@@ -238,17 +241,22 @@ func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 			return
 		}
 	}
-	srv.errorHandler(w,r,"Tarea desconocida para paquetar")
+	srv.errorHandler(w,r, ErrorResourceUnknown, nil)
 }
 
 
-func (srv *Server) errorHandler(w http.ResponseWriter, r *http.Request, message string){
+func (srv *Server) errorHandler(w http.ResponseWriter, r *http.Request, message string,erri error){
 
-	log.Printf("Error: %s from %s\n",message,getRequestIP(r))
+	if erri!=nil{
+		log.Printf("Error: %s from %s\n",erri,getRequestIP(r))
+	}else{
+		log.Printf("Error: %s from %s\n",message,getRequestIP(r))
+	}
+
 	t := template.Must(template.ParseFiles(srv.ResourcesPath+"/templates/error.html"))
 	err:=t.Execute(w, message)
 	if err!=nil{
-		log.Printf("%v\n",err)
+		log.Printf("render error: %v\n",err)
 	}
 }
 
@@ -260,7 +268,7 @@ func (srv *Server) renderTemplate(w http.ResponseWriter, r *http.Request,
 	t := template.Must(template.ParseFiles(srv.ResourcesPath+"/templates/"+name+".html"))
 	err:=t.Execute(w, cont)
 	if err!=nil{
-		log.Printf("%v\n",err)
+		log.Printf("render error: %v\n",err)
 	}
 }
 
