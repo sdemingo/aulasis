@@ -1,5 +1,5 @@
-Aulasis
-=======
+# Aulasis
+
 
 Aulasis is a little CMS to manage a students group workflow in the
 classroom.  It is written in Go and this code runs over Linux, Windows
@@ -9,6 +9,31 @@ syntax and they send you the assignments throught a web form.  Aulasis
 uses your filesystem to store the information, and it has been
 designed to run on a USB memory.
 
-To start Aulasis change to dist directory and run the execute file for your 
-Operating System. Now, Aulasis is running on 9090 port of your machine. Type 
-http://localhost:9090 in your browser and enjoy it.
+## For users
+
+Go the the [releases
+page](https://github.com/sdemingo/aulasis/releases) and download the
+latest version package. After uncompress it, run the executable file
+for your operating system. Now, Aulasis is running on 9090 port of
+your machine. Type  http://localhost:9090 in your browser and enjoy
+it.
+
+You can run aulasis with the folowings flags:
+
+```
+  -p	Service port
+  -d	Courses and tasks directory
+```
+
+## For developers
+
+Aulasis has been compiled and testing with Go 1.2. If you want to
+compile aulasis you must be know that the code has the followings
+dependencies:
+
+	   * [Blackfriday](http://github.com/russross/blackfriday) A
+             great markdown parser
+	   * [Osext](http://bitbucket.org/kardianos/osext) A simple library to find the
+	   absolute path of the executable file in the system
+
+Get them with `go get`, clone aulasis and enjoy it.
