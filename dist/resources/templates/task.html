@@ -8,7 +8,7 @@
     <script type="text/javascript" src="/resources/js/utils.js"></script>
     <script type="text/javascript">
      window.onload=function(){
-       document.getElementById("upload-form").onsubmit=checkSubmit
+       document.forms[0].onsubmit=checkSubmit
      }
     </script>
   </head>
@@ -29,14 +29,14 @@
 	  {{ .Content }}
 
 	  {{ if .CheckStatus "open" }}
-	<div id="upload-form">
+	<div id="upload-form" name="upload">
 	  <h2>Entrega de actividad</h2>
 	  <p>Selecciona los ficheros que quieras para enviar tu tarea. Recuerda que solo puedes seleccionar
 	      ficheros de un mismo directorio. No envies ningún fichero comprimido.</p>
 	  <form action="/submit/{{ .Course.Id }}/{{ .Id }}.html" method="POST" enctype="multipart/form-data"/>
 	  <div class="item">
 	    <label>Nombre:</label>
-	    <input type="text" name="name" id="name">
+	    <input type="text" name="uname" id="uname">
 	  </div>
 	  <div class="item">
 	    <label>Apellidos:</label>

@@ -157,7 +157,6 @@ func LoadTask(course *Course,taskId string)(*Task,error){
 	if task.LogFile!=TASK_PROP_NO &&
 		task.LogFile != TASK_PROP_YES{
 		task.LogFile=TASK_PROP_NO   //by default
-		log.Printf("Error: task file %s has a bad logfile property\n",task.Id)
 	}
 	task.Status=GetProperty(b,"status")
 	if task.Status!=TASK_CLOSED_STATUS && 

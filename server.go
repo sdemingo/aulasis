@@ -176,7 +176,8 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	sr.Addr=getRequestIP(r)
 	sr.Task=task
 
-	msg:=r.FormValue("name")+" "+r.FormValue("surname")+" entrega desde "+sr.Addr
+	msg:=fmt.Sprintf("%s %s entrega %d ficheros desde %s",
+		r.FormValue("name"), r.FormValue("surname"), sr.Files, sr.Addr)
 	task.WriteLog(msg)
 
 	log.Printf("Task %s submitted from %s\n",task.Title,getRequestIP(r))

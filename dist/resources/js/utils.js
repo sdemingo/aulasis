@@ -16,12 +16,12 @@ function showClock(div)
 
 
 function checkSubmit(){
-    var fr=document.getElementById("upload-form")
-    if (fr.name=="") || (fr.name==null){
+    var fr=document.forms[0]
+    if (fr.uname.value=="") {
 	alert ("El nombre no puede quedar en blanco")
 	return false
     }
-    if (fr.surname=="") || (fr.surname==null){
+    if (fr.surname.value==""){
 	alert ("El apellido no puede quedar en blanco")
 	return false
     }
