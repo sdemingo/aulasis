@@ -15,6 +15,20 @@ function showClock(div)
 }
 
 
+function checkSubmit(){
+    var fr=document.getElementById("upload-form")
+    if (fr.name=="") || (fr.name==null){
+	alert ("El nombre no puede quedar en blanco")
+	return false
+    }
+    if (fr.surname=="") || (fr.surname==null){
+	alert ("El apellido no puede quedar en blanco")
+	return false
+    }
+    return true
+}
+
+
 
 
 
