@@ -113,6 +113,8 @@ const TASK_OPEN_STATUS = "open"
 const TASK_CLOSED_STATUS = "close"
 const TASK_HIDE_STATUS = "hide"
 
+const TASK_PROP_YES = "yes"
+const TASK_PROP_NO = "no"
 
 type Task struct{
 	Course *Course
@@ -120,6 +122,7 @@ type Task struct{
 	Id string
 	Content string
 	Status string
+	LogFile string
 }
 
 
@@ -150,6 +153,12 @@ func LoadTask(course *Course,taskId string)(*Task,error){
 	task.Id=taskId
 	task.Title=GetContentTitle(b)
 	task.Course=course
+	task.LogFile=GetProperty(b,"logfile")
+	if task.LogFile!=TASK_PROP_NO &&
+		task.LogFile != TASK_PROP_YES{
+		task.LogFile=TASK_PROP_NO   //by default
+		log.Printf("Error: task file %s has a bad logfile property\n",task.Id)
+	}
 	task.Status=GetProperty(b,"status")
 	if task.Status!=TASK_CLOSED_STATUS && 
 		task.Status!=TASK_OPEN_STATUS && 
@@ -165,6 +174,19 @@ func LoadTask(course *Course,taskId string)(*Task,error){
 
 func (task *Task) CheckStatus(st string)(bool){
 	return task.Status==st
+}
+
+func (task *Task) WriteLog(msg string){
+	if task.LogFile==TASK_PROP_NO{
+		return
+	}
+	
+	logfile:=task.Course.BaseDir+"/"+task.Course.Id+"/"+task.Id+"/submits.log"
+	f, err := os.OpenFile(logfile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal("task log error: %v", err)
+	}
+	defer f.Close()
 }
 
 
