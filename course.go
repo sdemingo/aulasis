@@ -187,6 +187,10 @@ func (task *Task) WriteLog(msg string){
 		log.Fatal("task log error: %v", err)
 	}
 	defer f.Close()
+
+	log.SetOutput(f)
+	log.Println(msg)
+	log.SetOutput(os.Stdout)
 }
 
 

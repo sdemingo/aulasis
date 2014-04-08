@@ -175,7 +175,9 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	sr.Stamp=time.Now()
 	sr.Addr=getRequestIP(r)
 	sr.Task=task
-	task.WriteLog("Entrega de tarea")
+
+	msg:=r.FormValue("name")+" "+r.FormValue("surname")+" entrega desde "+sr.Addr
+	task.WriteLog(msg)
 
 	log.Printf("Task %s submitted from %s\n",task.Title,getRequestIP(r))
 	srv.renderTemplate(w,r,"submitted",sr)
