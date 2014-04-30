@@ -51,13 +51,35 @@ obligatorio para cada tarea es el fichero `info.md`. Este fichero
 contiene la descripción de la tarea en formato
 [markdown](http://es.wikipedia.org/wiki/Markdown), un sencillo
 mecanismo de edición rápida de documentos muy sencillo de
-utilizar. Junto con el contenido, en el fichero `info.md` podemos
+utilizar. 
+
+
+Dentro del directorio de la actividad podemos meter todos los ficheros
+que quieres servir junto con esta: imágenes, ficheros con código,
+archivos PDF, etc. Para enlazar los recursos estáticos servidos dentro
+de cada carpeta de actividad hemos de tener en cuenta que la ruta de
+estos ha de comenzar por `/courses/dirCurso/dirTarea`. Si por ejemplo
+quisiéramos visualizar una imagen contenida dentro del directorio de
+esta actividad escribiríamos:
+
+```
+![Alt text](/courses/inicio/empezando/imagen.jpg)
+```
+
+ Los ficheros enviados por los alumnos a través del formulario de entrega
+(mostrado solo en tareas abiertas) son almacenados bajo el mismo directorio
+donde se ha definido la actividad, en un subdirectorio llamado `submitted`.
+
+
+## Propiedades de las tareas
+
+Junto con el contenido, en el fichero `info.md` podemos
 establecer ciertas propiedades usando el prefijo `@>` seguido del
 nombre de la propiedad que queramos declarar.
 
-Para cada actividad, por ahora la única propiedad válida es su
-estado. El estado de una actividad o tarea puede estar este entre los
-siguientes:
+Una de las propiedades válidas para las tareas es el estado. El valor
+de la propiedad estado de una actividad o tarea puede estar este entre
+los siguientes:
 
    - **open**: Una tarea abierta es pública y ofrece un formulario en
        la parte inferior para enviar archivos al sistema.
@@ -76,18 +98,14 @@ hemos de incluir la siguiente linea en nuestro fichero `info.md`:
   -->
 ```
 
-Dentro del directorio de la actividad podemos meter todos los ficheros
-que quieres servir junto con esta: imágenes, ficheros con código,
-archivos PDF, etc. Para enlazar los recursos estáticos servidos dentro
-de cada carpeta de actividad hemos de tener en cuenta que la ruta de
-estos ha de comenzar por `/courses/dirCurso/dirTarea`. Si por ejemplo
-quisiéramos visualizar una imagen contenida dentro del directorio de
-esta actividad escribiríamos:
+De igual manera que con la anterior, podemos definir la propiedad de
+registro de entregas o `logfile`. Esta propiedad activa la creación de
+un fichero donde aulasis irá registrando la entrega de la tarea,
+apuntando la hora y la ip desde la cual se ha recibido la
+información. Para activar esta propiedad incluiremos en un entorno
+"properties" como el anterior la línea:
 
 ```
-![Alt text](/courses/inicio/empezando/imagen.jpg)
+ @>logfile:yes
 ```
 
- Los ficheros enviados por los alumnos a través del formulario de entrega
-(mostrado solo en tareas abiertas) son almacenados bajo el mismo directorio
-donde se ha definido la actividad, en un subdirectorio llamado `submitted`.
