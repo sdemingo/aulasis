@@ -121,7 +121,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		srv.errorHandler(w,r,ErrorTaskNotSubmitted,nil)
 	}
 
-	name:=cleanName(strings.ToLower(r.FormValue("name")))
+	name:=cleanName(strings.ToLower(r.FormValue("uname")))
 	surname:=cleanName(r.FormValue("surname"))
 
 	if name=="" || surname==""{
