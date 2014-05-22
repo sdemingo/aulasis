@@ -163,12 +163,15 @@ main ul{
     list-style: none;
 }
 
-main li:before {
+main ul li:before {
     content: '\2022'; 
     color: grey;
     padding-right:3px;
 }
 
+main ol ol { 
+    list-style-type: lower-alpha; 
+}
 
 #upload-form{
     position:relative;
