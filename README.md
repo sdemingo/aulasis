@@ -34,4 +34,4 @@ dependencies:
 * [Blackfriday](http://github.com/russross/blackfriday): A great markdown parser
 * [Osext](http://bitbucket.org/kardianos/osext): A simple library to find the absolute path of the executable file in the system
 
-Get them with `go get`, clone aulasis and enjoy it.
+Get them with `go get` and clone it.
