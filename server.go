@@ -4,6 +4,7 @@ package main
 import (
 	"text/template"
 	"net/http"
+	"net"
 	"strings"
 	"os"
 	"io"
@@ -11,11 +12,13 @@ import (
 	"regexp"
 	"log"
 	"fmt"
+	"errors"
 )
 
 const MaxBytesBodySize=20*1024*1024
 var ResourcesDir string
 
+const ErrorNoLocalIP="Servicio no arrancado. Interfaz local no encontrada"
 const ErrorTaskNotSubmitted="Tarea no entregada"
 const ErrorResourceUnknown="Pedido recurso desconocido"
 
@@ -58,6 +61,12 @@ func CreateServer(respath string,dirpath string)(*Server, error){
 
 
 func (srv *Server) Start(port int){
+	
+	pub,err:=srv.getPublicIp()
+	if err!=nil{
+		log.Fatal(err)
+	}
+
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir(srv.ResourcesPath)))) 
 
 	http.HandleFunc("/package/",srv.packageHandler)
@@ -65,8 +74,24 @@ func (srv *Server) Start(port int){
 	http.HandleFunc("/submit/",srv.submitHandler)
 	http.HandleFunc("/",srv.rootHandler)
 
-	
+	log.Printf("**** Aulasis running on %s:%d ****\n",pub,port)
 	http.ListenAndServe(fmt.Sprintf(":%d",port), nil)
+}
+
+func (srv *Server) getPublicIp()(string,error){
+	addrs,err:=net.InterfaceAddrs()
+	if err!=nil{
+		return "",err
+	}
+	for _,a:=range addrs{
+		if ipnet, ok := a.(*net.IPNet); ok {
+			if ipnet.IP.DefaultMask()!=nil && !ipnet.IP.IsLoopback(){
+				return ipnet.IP.String(),nil
+			}
+		}
+	}
+
+	return "",errors.New(ErrorNoLocalIP)
 }
 
 
@@ -209,7 +234,7 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 			srv.renderTemplate(w,r,"course",course)
 			return
 		}
-	
+		
 		srv.errorHandler(w,r, ErrorResourceUnknown,nil)
 		return
 	}else{
