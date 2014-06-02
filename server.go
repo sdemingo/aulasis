@@ -12,14 +12,12 @@ import (
 	"regexp"
 	"log"
 	"fmt"
-	"errors"
 	"math/rand"
 )
 
 const MaxBytesBodySize=20*1024*1024
 var ResourcesDir string
 
-const ErrorNoLocalIP="Servicio no arrancado. Interfaz local no encontrada"
 const ErrorTaskNotSubmitted="Tarea no entregada"
 const ErrorResourceUnknown="Pedido recurso desconocido"
 
@@ -96,7 +94,7 @@ func (srv *Server) getPublicIp()(string,error){
 		}
 	}
 
-	return "",errors.New(ErrorNoLocalIP)
+	return "127.0.0.1",nil
 }
 
 
@@ -212,7 +210,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		r.FormValue("name"), r.FormValue("surname"), sr.Files, sr.Addr)
 	task.WriteLog(msg)
 
-	log.Printf("Task %s submitted from %s\n",task.Title,getRequestIP(r))
+	log.Printf("Task '%s' submitted from %s\n",task.Title,getRequestIP(r))
 	srv.renderTemplate(w,r,"submitted",sr)
 }
 
@@ -326,14 +324,16 @@ func getRequestIP(r *http.Request)(string){
 // and check if the submit directory exits
 
 func submitWorker(c chan string){
-	
-	subpath:=<-c
-	_,err:=os.Stat(subpath)
-	if err==nil{
-		c<-subpath
-	}else{
-		rand.Seed(time.Now().UTC().UnixNano())
-		s:=fmt.Sprintf("%s\n",rand.Int())
-		c<-subpath+"-"+s
+
+	for ;;{
+		subpath:=<-c
+		_,err:=os.Stat(subpath)
+		if err!=nil{
+			c<-subpath
+		}else{
+			rand.Seed(time.Now().UTC().UnixNano())
+			s:=fmt.Sprintf("%d",rand.Int())
+			c<-subpath+"-"+s
+		}
 	}
 }
