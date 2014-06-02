@@ -63,10 +63,7 @@ func CreateServer(respath string,dirpath string)(*Server, error){
 
 func (srv *Server) Start(port int){
 	
-	pub,err:=srv.getPublicIp()
-	if err!=nil{
-		log.Fatal(err)
-	}
+	srv.showPublicIp(port)
 
 	go submitWorker(srv.sWorker)
 
@@ -77,24 +74,23 @@ func (srv *Server) Start(port int){
 	http.HandleFunc("/submit/",srv.submitHandler)
 	http.HandleFunc("/",srv.rootHandler)
 
-	log.Printf("**** Aulasis running on %s:%d ****\n",pub,port)
+	log.Printf("**** Aulasis running on port %d ****\n",port)
 	http.ListenAndServe(fmt.Sprintf(":%d",port), nil)
 }
 
-func (srv *Server) getPublicIp()(string,error){
+func (srv *Server) showPublicIp(port int){
 	addrs,err:=net.InterfaceAddrs()
 	if err!=nil{
-		return "",err
+		return
 	}
+	fmt.Printf("\n");
+	fmt.Printf("\t\tWelcome to Aulasis\n")
+	fmt.Printf("\t\t==================\n\n")
+	fmt.Printf(" Open your browse and try to connect to following addresses on port %d:\n",port)
 	for _,a:=range addrs{
-		if ipnet, ok := a.(*net.IPNet); ok {
-			if ipnet.IP.DefaultMask()!=nil && !ipnet.IP.IsLoopback(){
-				return ipnet.IP.String(),nil
-			}
-		}
+		fmt.Printf("\t%s\n",a.String())
 	}
-
-	return "127.0.0.1",nil
+	fmt.Printf("\n");
 }
 
 
