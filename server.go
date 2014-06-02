@@ -13,6 +13,7 @@ import (
 	"log"
 	"fmt"
 	"errors"
+	"math/rand"
 )
 
 const MaxBytesBodySize=20*1024*1024
@@ -28,6 +29,7 @@ type Server struct{
 	DirPath string
 	Config *ServerConfig
 	tmpl *template.Template
+	sWorker chan string
 }
 
 
@@ -55,6 +57,7 @@ func CreateServer(respath string,dirpath string)(*Server, error){
 	}
 
 	srv.Config=config
+	srv.sWorker=make(chan string)
 	
 	return srv,nil
 }
@@ -66,6 +69,8 @@ func (srv *Server) Start(port int){
 	if err!=nil{
 		log.Fatal(err)
 	}
+
+	go submitWorker(srv.sWorker)
 
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir(srv.ResourcesPath)))) 
 
@@ -155,6 +160,8 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dir:=srv.DirPath+"/"+task.Course.Id+"/"+task.Id+"/submitted/"+name+"-"+surname
+	srv.sWorker<-dir
+	dir=<-srv.sWorker // waiting for submitWorker confirmation
 	err:=os.MkdirAll(dir,0755)	
 	if err!=nil{
 		srv.errorHandler(w,r,ErrorTaskNotSubmitted,err)
@@ -312,4 +319,21 @@ func isDinamycUrl(url string)(bool){
 func getRequestIP(r *http.Request)(string){
 	f:=strings.Split(r.RemoteAddr,":")
 	return f[0]
+}
+
+
+// Go routine to order the submit requests on the filesystem
+// and check if the submit directory exits
+
+func submitWorker(c chan string){
+	
+	subpath:=<-c
+	_,err:=os.Stat(subpath)
+	if err==nil{
+		c<-subpath
+	}else{
+		rand.Seed(time.Now().UTC().UnixNano())
+		s:=fmt.Sprintf("%s\n",rand.Int())
+		c<-subpath+"-"+s
+	}
 }
