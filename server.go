@@ -83,10 +83,8 @@ func (srv *Server) showPublicIp(port int){
 	if err!=nil{
 		return
 	}
-	fmt.Printf("\n");
-	fmt.Printf("\t\tWelcome to Aulasis\n")
-	fmt.Printf("\t\t==================\n\n")
-	fmt.Printf(" Open your browse and try to connect to following addresses on port %d:\n",port)
+	fmt.Printf("  \n");
+	fmt.Printf("  Open your browse and try to connect to following addresses on port %d:\n\n",port)
 	for _,a:=range addrs{
 		fmt.Printf("\t%s\n",a.String())
 	}
