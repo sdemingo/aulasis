@@ -131,7 +131,7 @@ main pre>code{
     font-family: monospace;
 }
 
-main p>code{
+main code{
     padding-left:5px;
     padding-right:5px;
     border:1px solid silver;
