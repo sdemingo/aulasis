@@ -91,6 +91,11 @@ main table{
     border:1px solid grey;
 }
 
+main .course{
+    padding:10px;
+    margin-bottom:15px;
+}
+
 main h1{
     width:100%;
 

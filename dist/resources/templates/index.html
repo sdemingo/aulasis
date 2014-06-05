@@ -21,7 +21,7 @@
       {{range $i,$c := .Courses}}
       {{if $c}}
 	<div class="course">
-	  <h2><a href="/courses/{{$c.Id}}.html">{{$c.Name}}</h2></a>
+	  <h2><a href="/courses/{{$c.Id}}.html">{{$c.Name}}</a></h2>
 	  <p>{{$c.Desc}}</p>
 	</div>
      {{end}}
