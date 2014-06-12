@@ -13,6 +13,7 @@ import (
 	"log"
 	"fmt"
 	"math/rand"
+	"sync"
 )
 
 const MaxBytesBodySize=20*1024*1024
@@ -20,7 +21,7 @@ var ResourcesDir string
 
 const ErrorTaskNotSubmitted="Tarea no entregada"
 const ErrorResourceUnknown="Pedido recurso desconocido"
-const ErrorServerUpdating="Servidor actualizando datos. Inténtelo pasados unos segundos"
+const ErrorServerSuspended="Servidor parado temporalmente. Inténtelo pasados unos segundos"
 
 
 type Server struct{
@@ -29,6 +30,8 @@ type Server struct{
 	Config *ServerConfig
 	tmpl *template.Template
 	sWorker chan string
+	suspended bool
+	reqGroup sync.WaitGroup
 }
 
 
@@ -57,7 +60,8 @@ func CreateServer(respath string,dirpath string)(*Server, error){
 
 	srv.Config=config
 	srv.sWorker=make(chan string)
-	
+	srv.suspended=false
+
 	return srv,nil
 }
 
@@ -66,7 +70,8 @@ func (srv *Server) Start(port int){
 	
 	srv.showPublicIp(port)
 
-	go submitWorker(srv.sWorker)
+	go srv.submitWorker()
+	go srv.updateWorker()
 
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir(srv.ResourcesPath)))) 
 
@@ -119,6 +124,7 @@ func (srv *Server) getCourseAndTask(url string)(*Course,*Task){
 }
 
 
+
 func cleanName(name string)(string){
 	var noChars = regexp.MustCompile("[^A-Za-záéíóúÁÉÍÓÚñÑüÜ]+")
 	out:=noChars.ReplaceAllString(name,"")
@@ -154,18 +160,32 @@ func getRequestIP(r *http.Request)(string){
 
 // Go routine to order the submit requests on the filesystem
 // and check if the submit directory exits
-
-func submitWorker(c chan string){
+func (srv *Server) submitWorker(){
 
 	for ;;{
-		subpath:=<-c
+		subpath:=<-srv.sWorker
 		_,err:=os.Stat(subpath)
 		if err!=nil{
-			c<-subpath
+			srv.sWorker<-subpath
 		}else{
 			rand.Seed(time.Now().UTC().UnixNano())
 			s:=fmt.Sprintf("%d",rand.Int())
-			c<-subpath+"-"+s
+			srv.sWorker<-subpath+"-"+s
+		}
+	}
+}
+
+// Goroutine to check configserver updates.
+func (srv *Server) updateWorker(){
+	for ;;{
+		time.Sleep(30 * time.Second)
+		if srv.Config.IsUpdated(){
+			srv.suspended=true
+			// if IsUpdate return true it must manage the update
+			// loading the new config when all reques are done
+			srv.reqGroup.Wait()
+			log.Printf("todas las peticiones están terminadas")
+			log.Printf("Ejecutar ahora la nueva carga");
 		}
 	}
 }
@@ -186,10 +206,13 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 	rpath:=strings.TrimPrefix(r.URL.Path,"/submit/")
 
-	if srv.Config.IsUpdating{
-		srv.errorHandler(w,r,ErrorServerUpdating,nil)
+	if srv.suspended{
+		srv.errorHandler(w,r,ErrorServerSuspended,nil)
 		return
 	}
+
+	srv.reqGroup.Add(1)
+	defer srv.reqGroup.Done()
 
 	var task *Task
 	if isDinamycUrl(rpath){
@@ -268,10 +291,13 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
-	if srv.Config.IsUpdating{
-		srv.errorHandler(w,r,ErrorServerUpdating,nil)
+	if srv.suspended{
+		srv.errorHandler(w,r,ErrorServerSuspended,nil)
 		return
 	}
+
+	srv.reqGroup.Add(1)
+	defer srv.reqGroup.Done()
 
 	if strings.Contains(r.URL.Path,"submit"){
 		srv.errorHandler(w,r, ErrorResourceUnknown,nil)
@@ -312,10 +338,13 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
 
-	if srv.Config.IsUpdating{
-		srv.errorHandler(w,r,ErrorServerUpdating,nil)
+	if srv.suspended{
+		srv.errorHandler(w,r,ErrorServerSuspended,nil)
 		return
 	}
+
+	srv.reqGroup.Add(1)
+	defer srv.reqGroup.Done()
 
 	log.Printf("Packaging request from %s\n",getRequestIP(r))
 	rpath:=strings.TrimPrefix(r.URL.Path,"/package/")
