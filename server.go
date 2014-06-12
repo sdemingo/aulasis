@@ -154,7 +154,12 @@ func isDinamycUrl(url string)(bool){
 
 func getRequestIP(r *http.Request)(string){
 	f:=strings.Split(r.RemoteAddr,":")
-	return f[0]
+	ad:=net.ParseIP(f[0])
+	if ad!=nil{
+		return ad.String()
+	}else{
+		return "unknow"
+	}
 }
 
 
@@ -283,7 +288,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 		r.FormValue("name"), r.FormValue("surname"), sr.Files, sr.Addr)
 	task.WriteLog(msg)
 
-	log.Printf("Task '%s' submitted from %s\n",task.Title,getRequestIP(r))
+	log.Printf("Task '%s' submitted from %s\n",task.Id,getRequestIP(r))
 	srv.renderTemplate(w,r,"submitted",sr)
 }
 
