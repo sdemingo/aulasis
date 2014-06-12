@@ -20,6 +20,7 @@ var ResourcesDir string
 
 const ErrorTaskNotSubmitted="Tarea no entregada"
 const ErrorResourceUnknown="Pedido recurso desconocido"
+const ErrorServerUpdating="Servidor actualizando datos. Inténtelo pasados unos segundos"
 
 
 type Server struct{
@@ -126,21 +127,76 @@ func cleanName(name string)(string){
 }
 
 
+func (srv *Server) renderTemplate(w http.ResponseWriter, r *http.Request, 
+	name string,
+	cont interface{}) {
+
+	t := template.Must(template.ParseFiles(srv.ResourcesPath+"/templates/"+name+".html"))
+	err:=t.Execute(w, cont)
+	if err!=nil{
+		log.Printf("render error: %v\n",err)
+	}
+}
+
+
+
+func isDinamycUrl(url string)(bool){
+	//ends with an .html extensions or is the root 
+	return url=="" || strings.HasSuffix(url,".html")
+}
+
+
+func getRequestIP(r *http.Request)(string){
+	f:=strings.Split(r.RemoteAddr,":")
+	return f[0]
+}
+
+
+// Go routine to order the submit requests on the filesystem
+// and check if the submit directory exits
+
+func submitWorker(c chan string){
+
+	for ;;{
+		subpath:=<-c
+		_,err:=os.Stat(subpath)
+		if err!=nil{
+			c<-subpath
+		}else{
+			rand.Seed(time.Now().UTC().UnixNano())
+			s:=fmt.Sprintf("%d",rand.Int())
+			c<-subpath+"-"+s
+		}
+	}
+}
+
+
+
 func (srv *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/courses", http.StatusMovedPermanently)
 }
 
 
 
+/*
+ Handlers
+*/
+
 func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 	rpath:=strings.TrimPrefix(r.URL.Path,"/submit/")
+
+	if srv.Config.IsUpdating{
+		srv.errorHandler(w,r,ErrorServerUpdating,nil)
+		return
+	}
 
 	var task *Task
 	if isDinamycUrl(rpath){
 		_,task=srv.getCourseAndTask(rpath)
 	}else{
 		srv.errorHandler(w,r,ErrorTaskNotSubmitted,nil)
+		return
 	}
 
 	name:=cleanName(strings.ToLower(r.FormValue("uname")))
@@ -212,10 +268,16 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
+	if srv.Config.IsUpdating{
+		srv.errorHandler(w,r,ErrorServerUpdating,nil)
+		return
+	}
+
 	if strings.Contains(r.URL.Path,"submit"){
 		srv.errorHandler(w,r, ErrorResourceUnknown,nil)
 		return
 	}
+
 	rpath:=strings.TrimPrefix(r.URL.Path,"/courses/")
 	if rpath==""{
 		srv.renderTemplate(w,r,"index",srv.Config)
@@ -249,6 +311,11 @@ func (srv *Server) coursesHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func (srv *Server) packageHandler(w http.ResponseWriter, r *http.Request){
+
+	if srv.Config.IsUpdating{
+		srv.errorHandler(w,r,ErrorServerUpdating,nil)
+		return
+	}
 
 	log.Printf("Packaging request from %s\n",getRequestIP(r))
 	rpath:=strings.TrimPrefix(r.URL.Path,"/package/")
@@ -285,49 +352,5 @@ func (srv *Server) errorHandler(w http.ResponseWriter, r *http.Request, message 
 	err:=t.Execute(w, message)
 	if err!=nil{
 		log.Printf("render error: %v\n",err)
-	}
-}
-
-
-func (srv *Server) renderTemplate(w http.ResponseWriter, r *http.Request, 
-	name string,
-	cont interface{}) {
-
-	t := template.Must(template.ParseFiles(srv.ResourcesPath+"/templates/"+name+".html"))
-	err:=t.Execute(w, cont)
-	if err!=nil{
-		log.Printf("render error: %v\n",err)
-	}
-}
-
-
-
-func isDinamycUrl(url string)(bool){
-	//ends with an .html extensions or is the root 
-	return url=="" || strings.HasSuffix(url,".html")
-}
-
-
-func getRequestIP(r *http.Request)(string){
-	f:=strings.Split(r.RemoteAddr,":")
-	return f[0]
-}
-
-
-// Go routine to order the submit requests on the filesystem
-// and check if the submit directory exits
-
-func submitWorker(c chan string){
-
-	for ;;{
-		subpath:=<-c
-		_,err:=os.Stat(subpath)
-		if err!=nil{
-			c<-subpath
-		}else{
-			rand.Seed(time.Now().UTC().UnixNano())
-			s:=fmt.Sprintf("%d",rand.Int())
-			c<-subpath+"-"+s
-		}
 	}
 }

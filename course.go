@@ -3,6 +3,7 @@ package main
 
 import (
 	"os"
+	"bytes"
 	"log"
 	"encoding/xml"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 	"text/template"
 	"path/filepath"
 	"regexp"
+	"crypto/md5"
 )
 
 
@@ -19,6 +21,8 @@ type ServerConfig struct{
 	DirPath string
 	XMLName xml.Name `xml:"serverconfig"`
 	Courses []*Course `xml:"course"`
+	IsUpdating bool
+	metaSum []byte
 }
 
 
@@ -30,9 +34,13 @@ func LoadServerConfig (dir string)(*ServerConfig,error){
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
+	h := md5.New()
+	
 
 	config:=new(ServerConfig)
 
+	config.metaSum=h.Sum(b)
+	config.IsUpdating=false
 	config.DirPath=dir
 	err = xml.Unmarshal(b, &config)
 	if err != nil {
@@ -43,6 +51,8 @@ func LoadServerConfig (dir string)(*ServerConfig,error){
 		config.Courses[c].Desc=strings.Trim(config.Courses[c].Desc, " \n")
 		LoadCourse(dir, config.Courses[c])
 	}
+
+	go config.checkUpdateProc()
 
 	return config,nil
 }
@@ -58,8 +68,32 @@ func (sc *ServerConfig) GetCourseById(id string)(*Course){
 }
 
 
+func (sc *ServerConfig) checkUpdate()(bool,*ServerConfig){
+	
+	dir:=sc.DirPath
+	newConfig,err:=LoadServerConfig(dir)
+	if err!=nil{
+		return false,nil
+	}
+	
+	// Check meta file
+	if bytes.Compare(newConfig.metaSum,sc.metaSum)!=0 {
+		log.Printf("Detected update in meta.xml file\n")
+		sc.IsUpdating=true
+		return true,newConfig
+	}
+	
+	return false,nil
+}
 
-
+func (sc *ServerConfig) checkUpdateProc(){
+	for ;;{
+		time.Sleep(30 * time.Second)
+		sc.checkUpdate()
+		// if checkUpdate return true it must manage the update
+		// loading the new config when all reques are done
+	}
+}
 
 
 
