@@ -92,8 +92,34 @@ main table{
 }
 
 main .course{
+    width:100%;
     padding:10px;
     margin-bottom:15px;
+
+    border:1px solid grey;
+    border-radius:3px; 
+    -moz-border-radius:3px; /* Firefox */ 
+    -webkit-border-radius:3px; /* Safari y Chrome */
+}
+
+main .course:hover{
+    background-color:#F7F7F7;
+}
+
+main #course-desc{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+main #course-tasks{
+    width:80%;
+    margin: 0 auto;
+    background-color:#F7F7F7;
+
+    border:1px solid grey;
+    border-radius:3px; 
+    -moz-border-radius:3px; /* Firefox */ 
+    -webkit-border-radius:3px; /* Safari y Chrome */
 }
 
 main h1{
@@ -121,7 +147,7 @@ main pre{
     margin:0 auto;
     border: 1px double grey;
     padding:10px;
-    background-color:#E8E8E8 ;
+    background-color:#F7F7F7;
 }
 
 main code{

@@ -20,8 +20,8 @@
 	<h1>Cursos</h1>
       {{range $i,$c := .Courses}}
       {{if $c}}
-	<div class="course">
-	  <h2><a href="/courses/{{$c.Id}}.html">{{$c.Name}}</a></h2>
+	<div class="course" onclick="window.location='/courses/{{$c.Id}}.html';">
+	  <h2>{{$c.Name}}</h2>
 	  <p>{{$c.Desc}}</p>
 	</div>
      {{end}}
