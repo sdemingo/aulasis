@@ -72,16 +72,31 @@ func (sc *ServerConfig) IsUpdated()(bool){
 		return false
 	}
 	
-	// Check meta file
 	if bytes.Compare(newConfig.metaSum,sc.metaSum)!=0 {
 		log.Printf("Detected update in meta.xml file\n")
 		return true
 	}
 	
-	// TODO:
-	// Check number of courses
-	// Check number of tasks for each course
-	// Check the hash of each task
+	if len(newConfig.Courses)!=len(sc.Courses){
+		log.Printf("Detected different number of courses\n")
+		return true
+	}
+
+	for c:=range newConfig.Courses{
+		if len(newConfig.Courses[c].Tasks)!=len(sc.Courses[c].Tasks){
+			log.Printf("Detected course with different number of tasks\n")
+			return true
+		}
+		for t:= range newConfig.Courses[c].Tasks{
+			newHash:=newConfig.Courses[c].Tasks[t].taskSum
+			oldHash:=sc.Courses[c].Tasks[t].taskSum
+			if bytes.Compare(newHash,oldHash)!=0 {
+				log.Printf("Detected update in task '%s'\n",sc.Courses[c].Tasks[t].Id)
+				return true
+			}
+		}
+	}
+
 	return false
 }
 
@@ -149,6 +164,7 @@ type Task struct{
 	Content string
 	Status string
 	LogFile string
+	taskSum []byte
 }
 
 
@@ -173,8 +189,10 @@ func LoadTask(course *Course,taskId string)(*Task,error){
 	defer orgFile.Close()
 
 	b, _ := ioutil.ReadAll(orgFile)
+	h := md5.New()
 
 	task:=new(Task)
+	task.taskSum=h.Sum(b)
 	task.Content=GetContentHTML(b)
 	task.Id=taskId
 	task.Title=GetContentTitle(b)
