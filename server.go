@@ -186,11 +186,17 @@ func (srv *Server) updateWorker(){
 		time.Sleep(30 * time.Second)
 		if srv.Config.IsUpdated(){
 			srv.suspended=true
-			// if IsUpdate return true it must manage the update
-			// loading the new config when all reques are done
 			srv.reqGroup.Wait()
-			log.Printf("todas las peticiones están terminadas")
-			log.Printf("Ejecutar ahora la nueva carga");
+
+			// all requests gouroutines are finished. So now, 
+			// it updates the config
+			config,err:=LoadServerConfig(srv.DirPath)
+			if err!=nil{
+				log.Printf("Error updating server storage: %s\n",err)
+			}else{
+				srv.Config=config
+			}
+			srv.suspended=false
 		}
 	}
 }
@@ -205,7 +211,7 @@ func (srv *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
 
 /*
  Handlers
-*/
+ */
 
 func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
