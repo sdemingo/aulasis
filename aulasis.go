@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"bitbucket.org/kardianos/osext"
+	"os"
 	"strings"
 	"flag"
 	"fmt"
@@ -25,27 +25,28 @@ var LICENSE=`
   along with this program.  If not, see <http://www.gnu.org/licenses/>.`
 
 var portFlag = flag.Int("p", 9090, "Service port")
-var docFlag = flag.String("d", "", "Courses and tasks directory")
+var docFlag = flag.String("d", "", "Data directory")
 
 func main() {
 
 	flag.Parse()
 	port:=*portFlag
-
-	execpath,err:=osext.ExecutableFolder()
-	if err!=nil{
-		log.Panic(err)
-	}	
-	execpath=strings.TrimRight(execpath,"/\\")
-
+	
 	docpath:=strings.TrimRight(*docFlag,"/\\")
+	var err error
 	if docpath==""{
-		docpath=execpath+"/courses"
+		docpath,err=os.Getwd()
+		if err!=nil{
+			log.Panic(err)
+		}
+		docpath=docpath+"/data"
 	}
+	coursepath:=docpath+"/courses"
+	respath:=docpath+"/resources"
 
 	fmt.Println(LICENSE)
 
-	srv,err:=CreateServer(execpath+"/resources",docpath)
+	srv,err:=CreateServer(respath,coursepath)
 	if err!=nil{
 		log.Panic(err)
 	}
