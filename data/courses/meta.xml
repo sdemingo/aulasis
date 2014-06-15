@@ -1,7 +1,13 @@
 <serverconfig>
-  <config>
-    
-  </config>
+  <admin>
+    <smtp>
+      <addr>smtp.server.com</addr>
+      <port>587</port>
+      <user>username</user>
+      <pass>password</pass>
+    </smtp>
+    <forward>forward@addr.com</forward>
+  </admin>
   <course>
     <name>Inicio</name>
     <path>inicio</path>

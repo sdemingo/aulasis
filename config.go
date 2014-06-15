@@ -13,8 +13,21 @@ import (
 type ServerConfig struct{
 	DirPath string
 	XMLName xml.Name `xml:"serverconfig"`
+	AdminConfig Admin `xml:"admin"`
 	Courses []*Course `xml:"course"`
 	metaSum []byte
+}
+
+type Admin struct{
+	Smtp SmtpConfig `xml:"smtp"`
+	ForwardAddr string `xml:"forward"`
+}
+
+type SmtpConfig struct{
+	Addr string `xml:"addr"`
+	Port string `xml:"port"`
+	User string `xml:"user"`
+	Password string `xml:"pass"`
 }
 
 
@@ -28,7 +41,6 @@ func LoadServerConfig (dir string)(*ServerConfig,error){
 	b, _ := ioutil.ReadAll(xmlFile)
 	h := md5.New()
 	
-
 	config:=new(ServerConfig)
 
 	config.metaSum=h.Sum(b)
