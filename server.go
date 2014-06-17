@@ -221,12 +221,14 @@ func (srv *Server) forwardWorker(sub *SubmitReport){
 	}
 	
 	fwaddr:=srv.Config.AdminConfig.ForwardAddr
-
-
 	toAddr:=srv.Config.AdminConfig.ForwardAddr
 	smtpData:=srv.Config.AdminConfig.Smtp
+	subject:=fmt.Sprintf("[Aulasis] Entrega '%s' de %s %s",
+		sub.Task.Id,sub.Name,sub.Surname)
+	body:=fmt.Sprintf("Entrega '%s' de %s %s",
+		sub.Task.Id,sub.Name,sub.Surname)
 
-	m:=NewEmailMsg("Entrega de práctica","Cuerpo del mensaje")
+	m:=NewEmailMsg(subject,body)
 	m.From = "aulasis"
 	m.To = []string{toAddr}
 	err = m.Attach(zp)
@@ -329,6 +331,8 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sr:=new (SubmitReport)
+	sr.Name=r.FormValue("uname")
+	sr.Surname=r.FormValue("surname")
 	sr.Files=len(files)
 	sr.Path=dir
 	sr.Stamp=time.Now()
@@ -338,7 +342,7 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 	go srv.forwardWorker(sr)  // launch the forwarding routine
 
 	msg:=fmt.Sprintf("%s %s entrega %d ficheros desde %s",
-		r.FormValue("name"), r.FormValue("surname"), sr.Files, sr.Addr)
+		sr.Name, sr.Surname, sr.Files, sr.Addr)
 	task.WriteLog(msg)
 
 	log.Printf("Task '%s' submitted from %s\n",task.Id,getRequestIP(r))
