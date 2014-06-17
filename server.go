@@ -8,12 +8,14 @@ import (
 	"strings"
 	"os"
 	"io"
+	"io/ioutil"
 	"time"
 	"regexp"
 	"log"
 	"fmt"
 	"math/rand"
 	"sync"
+	"path/filepath"
 )
 
 const MaxBytesBodySize=20*1024*1024
@@ -202,6 +204,30 @@ func (srv *Server) updateWorker(){
 }
 
 
+// Goroutine to package the submitted task and forward it to the admin email
+func (srv *Server) forwardWorker(sub *SubmitReport){
+
+	name:=filepath.Base(sub.Path)
+	tdir,err:=ioutil.TempDir("",name+"-")
+	if err!=nil{
+		return
+	}
+
+	zp:=tdir+"/"+name+".zip"
+	err=Zip(zp,sub.Path,sub.Path)
+	if err!=nil{
+		log.Printf("Error in forwarding the task '%s'",sub.Task.Id)
+		return
+	}
+	
+	fwaddr:=srv.Config.AdminConfig.ForwardAddr
+
+	os.Remove(zp)
+	os.Remove(tdir)
+	log.Printf("Task '%s' forwarding to %s\n",sub.Task.Id,fwaddr)
+}
+
+
 
 func (srv *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/courses", http.StatusMovedPermanently)
@@ -286,9 +312,12 @@ func (srv *Server) submitHandler(w http.ResponseWriter, r *http.Request) {
 
 	sr:=new (SubmitReport)
 	sr.Files=len(files)
+	sr.Path=dir
 	sr.Stamp=time.Now()
 	sr.Addr=getRequestIP(r)
 	sr.Task=task
+
+	go srv.forwardWorker(sr)  // launch the forwarding routine
 
 	msg:=fmt.Sprintf("%s %s entrega %d ficheros desde %s",
 		r.FormValue("name"), r.FormValue("surname"), sr.Files, sr.Addr)
