@@ -81,21 +81,3 @@ func (m *EmailMsg) SendEmailMsg(smtpData SmtpConfig) error {
 }
 
 
-/*
- 
-m:=NewEmailMsg("Probando envio de comprimidos","Cuerpo del mensaje")
-m.From = "aulasis"
-m.To = []string{toAddr}
-err = m.Attach(zp)
-if err != nil {
-	log.Printf("Error forwarding task '%s':%s",sub.Task.Id,err)
-	return
-}
-
-auth:=smtp.PlainAuth("", smtpData.User, smtpData.Pass, smtpData.Server)
-err = m.SendEmailMsg(smtpData.Server+":"+smtpData.Port, auth)
-if err != nil {
-	log.Printf("Error forwarding task '%s':%s",sub.Task.Id,err)
-	return
-}
-*/
