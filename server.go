@@ -216,11 +216,29 @@ func (srv *Server) forwardWorker(sub *SubmitReport){
 	zp:=tdir+"/"+name+".zip"
 	err=Zip(zp,sub.Path,sub.Path)
 	if err!=nil{
-		log.Printf("Error in forwarding the task '%s'",sub.Task.Id)
+		log.Printf("Error forwarding task '%s'",sub.Task.Id)
 		return
 	}
 	
 	fwaddr:=srv.Config.AdminConfig.ForwardAddr
+
+
+	toAddr:=srv.Config.AdminConfig.ForwardAddr
+	smtpData:=srv.Config.AdminConfig.Smtp
+
+	m:=NewEmailMsg("Entrega de práctica","Cuerpo del mensaje")
+	m.From = "aulasis"
+	m.To = []string{toAddr}
+	err = m.Attach(zp)
+	if err != nil {
+		log.Printf("Error forwarding task '%s':%s",sub.Task.Id,err)
+		return
+	}
+	err = m.SendEmailMsg(smtpData)
+	if err != nil {
+		log.Printf("Error forwarding task '%s':%s",sub.Task.Id,err)
+		return
+	}
 
 	os.Remove(zp)
 	os.Remove(tdir)
