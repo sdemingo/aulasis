@@ -25,7 +25,7 @@ var LICENSE=`
   along with this program.  If not, see <http://www.gnu.org/licenses/>.`
 
 var portFlag = flag.Int("p", 9090, "Service port")
-var docFlag = flag.String("d", "", "Data directory")
+var docFlag = flag.String("d", "", "Data directory (resources and course information)")
 
 func main() {
 

@@ -22,7 +22,7 @@ You can run aulasis with the folowings flags:
 
 ```
   -p	Service port
-  -d	Courses and tasks directory
+  -d	Data directory (resources and course information)
 ```
 
 ## For developers
